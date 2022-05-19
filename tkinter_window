@@ -1,0 +1,27 @@
+from tkinter import *
+from tkinter import ttk
+from PIL import ImageTk, Image  
+
+
+def main():
+
+    root = Tk()
+    frm = ttk.Frame(root, padding=300, width= 600, height=500)
+    frm.grid()
+    # Create a photoimage object of the image in the path
+    image1 = Image.open("UVStock.png")
+    image1 = image1.resize((200, 50)) # Resize image
+    test = ImageTk.PhotoImage(image1)
+
+
+    label1 = ttk.Label(image=test) #It use the variable test(photo) as the label
+    # Position image
+    label1.place(relx=0.38, rely=0)
+
+    # Button Sell, Buy
+    ttk.Button(frm, text="Buy").place(x = -200, y = 100)
+    ttk.Button(frm, text="Sell").place(x = 150, y = 100)
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
