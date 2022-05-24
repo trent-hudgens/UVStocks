@@ -18,7 +18,7 @@ def main():
     # Build and place the logo frame
     logo_frm = Frame(root)
 
-    img = Image.open("UVStock_logo.png")
+    img = Image.open("UVStocks_logo.png")
     img = img.resize((200, 50)) # Resize image
     UVlogo = ImageTk.PhotoImage(img)
     Label(logo_frm, image=UVlogo).pack()
