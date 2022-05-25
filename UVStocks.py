@@ -4,6 +4,15 @@ from PIL import ImageTk, Image
 
 def dummy():
     '''placeholder for button commands.'''
+
+    #the following code is used to clear and then restore the default value, "amount", to the inputAmount entry
+    #it should be run when buy or sell is clicked
+    #note: inputAmount is defined after this which may cause issues
+    #amountStr = str(inputAmount.get())
+    #if amountStr == "":
+        #inputAmount.insert(0, "Amount")
+        #root.focus()
+
     pass
 
 
@@ -59,13 +68,7 @@ def main():
         amountStr = str(inputAmount.get())
         if amountStr == "Amount":
             inputAmount.delete(0, 'end')
-    def focusOutInput(*args):
-        amountStr = str(inputAmount.get())
-        if amountStr == "":
-            inputAmount.insert(0, "Amount")
-            root.focus()
     inputAmount.bind("<Button-1>", clickInput)
-    inputAmount.bind("<FocusOut>", focusOutInput)
     input_amount_frm.pack()
 
     score_frm = Frame(root)
