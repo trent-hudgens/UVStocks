@@ -17,6 +17,7 @@ def dummy():
 
     pass
 
+
 def main():
 
     # Initialize + configure the main window
