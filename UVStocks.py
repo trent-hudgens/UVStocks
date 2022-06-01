@@ -63,7 +63,9 @@ def main():
 
     def animate(i, xs, ys, data, ax):
         '''animate function to be called repeatedly to update the graph'''
-        ys.append(next(data))
+        CURR_STOCK_PRICE = round(next(data), 2)
+        ys.append(CURR_STOCK_PRICE)
+        print(CURR_STOCK_PRICE)
         ys = ys[-25:] # only show the last 25 values
 
         ax.clear()
