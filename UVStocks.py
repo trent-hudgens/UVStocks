@@ -1,23 +1,32 @@
 from tkinter import *
 from PIL import ImageTk, Image  
 import stock_generator as stgen
+# from buy_sell import buy, sell
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-def dummy():
-    '''placeholder for button commands.'''
+# THE WAY I'M DOING THIS SUCKS I THINK. I DON'T KNOW HOW ELSE TO DO IT JARED PLEASE HELP MEEEEEEEEEEEE
+CURR_STOCK_PRICE = 1000 # this needs to be changed to whatever we initialize the stock price to
 
-    #the following code is used to clear and then restore the default value, "amount", to the inputAmount entry
-    #it should be run when buy or sell is clicked
-    #note: inputAmount is defined after this which may cause issues
-    #amountStr = str(inputAmount.get())
-    #if amountStr == "":
-        #inputAmount.insert(0, "Amount")
-        #root.focus()
+def command(f, *args, **kwargs):
+    '''allows passing of arguments when binding functions to tkinter buttons'''
+    return lambda:f(*args, **kwargs)
 
+def buy():
+    '''
+    shows how to use CURR_STOCK_PRICE. it's a global variable that's updated to always reflect the current stock price.
+    use this to build your buy/sell functions. For now it just prints the current stock price.
+    '''
+    global CURR_STOCK_PRICE
+    
+    print(CURR_STOCK_PRICE)
+
+    pass
+
+def sell():
     pass
 
 
@@ -33,7 +42,7 @@ def main():
     logo_frm = Frame(root)
     logo_frm.pack()
 
-    img = Image.open("UVStocks_logo.png")
+    img = Image.open("images/UVStocks-logo.png")
     img = img.resize((200, 50)) # Resize image
     UVlogo = ImageTk.PhotoImage(img)
     Label(logo_frm, image=UVlogo).pack()
@@ -63,9 +72,10 @@ def main():
 
     def animate(i, xs, ys, data, ax):
         '''animate function to be called repeatedly to update the graph'''
-        CURR_STOCK_PRICE = round(next(data), 2)
+        global CURR_STOCK_PRICE
+        CURR_STOCK_PRICE = round(next(data), 2) # UPDATES THE GLOBAL STOCK PRICE
         ys.append(CURR_STOCK_PRICE)
-        print(CURR_STOCK_PRICE)
+        # print(CURR_STOCK_PRICE) # debugging. prints stock price every time it updates
         ys = ys[-25:] # only show the last 25 values
 
         ax.clear()
@@ -79,9 +89,9 @@ def main():
     btn_frm = Frame(root)
     btn_frm.pack()
 
-    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=dummy)
+    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=buy)
     b1.pack(side=LEFT, padx=50)
-    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=dummy)
+    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=sell)
     b2.pack(side=RIGHT, padx=50)
 
 
