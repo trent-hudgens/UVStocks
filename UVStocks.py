@@ -1,31 +1,13 @@
 from tkinter import *
 from PIL import ImageTk, Image  
-import stock_generator as stgen
-# from buy_sell import buy, sell
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-class GameData:
-    def __init__(self, stock_generator, start_price, ):
-        self.stock_generator = stock_generator
-        self.stock_price = start_price
-        # cash held
-        # stock held
-        # total score
+from game_data import StockData
+from buy_sell import buy, sell
 
-    def update_price(self):
-        self.stock_price = next(self.stock_generator)
-
-    def buy(self):
-        '''TODO JOSUE/KYLER/DAVID: use this to build your buy/sell functions. For now it just prints the current stock price.'''
-        print(self.stock_price)
-
-    def sell(self):
-        '''TODO JOSUE/KYLER/DAVID: use this to build your buy/sell functions. For now it just prints the current stock price.'''
-        print(self.stock_price)
 
 def command(f, *args, **kwargs):
     '''allows passing of arguments when binding functions to tkinter buttons'''
@@ -35,11 +17,7 @@ def command(f, *args, **kwargs):
 def main():
     '''main execution'''
 
-    # Initialize stock_data, that holds all the values for the game
-    gen = stgen.stock_history(500) # generator that creates the stock price data
-    start_price = 1000
-    
-    game_data = GameData(gen, start_price, )
+    stock_data = StockData()
 
     # Initialize + configure the main window
     root = Tk()
@@ -85,11 +63,11 @@ def main():
 
     def animate(i, xs, ys, ax):
         '''animate function to be called repeatedly to update the graph'''
-        # global game_data
-        game_data.update_price() # UPDATES THE GLOBAL STOCK PRICE
-        print(game_data.stock_price) ### DEBUG. prints stock price every time it updates
+        # global stock_data
+        stock_data.update_price() # UPDATES THE GLOBAL STOCK PRICE
+        print(stock_data.stock_price) ### DEBUG. prints stock price every time it updates
 
-        ys.append(game_data.stock_price)
+        ys.append(stock_data.stock_price)
 
         ax.clear()
         ys = ys[-25:] # only show the last 25 values
@@ -103,9 +81,9 @@ def main():
     btn_frm = Frame(root)
     btn_frm.pack()
 
-    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=game_data.buy)
+    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=command(buy, stock_data))
     b1.pack(side=LEFT, padx=50)
-    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=game_data.sell)
+    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=command(sell, stock_data))
     b2.pack(side=RIGHT, padx=50)
 
 

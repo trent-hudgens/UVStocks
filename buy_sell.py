@@ -1,5 +1,18 @@
-# as it stands the current buy ssell stuff only works when in the same module. this will be fixed when jared 
-# and i implement the class for stock price stuff etc
+def buy(stock_data):
+    '''
+    TODO JOSUE/KYLER/DAVID: use this to build your buy/sell functions. For now it just prints the current stock price.
+    the first argument must be stock_data, an instantiation of the StockData class.
+    '''
+    print("You bought x amount of stock")
+    # return lambda : None
+
+def sell(stock_data):
+    '''
+    TODO JOSUE/KYLER/DAVID: use this to build your buy/sell functions. For now it just prints the current stock price.
+    the first argument must be stock_data, an instantiation of the StockData class.
+    '''
+    print("You sold x amount of stock")
+    # return lambda : None
 
 # def buy(currPrice, buyStocks, wallet, numStocks):
 #     '''placeholder for button commands.'''
