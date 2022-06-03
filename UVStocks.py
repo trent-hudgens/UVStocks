@@ -8,32 +8,46 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-# THE WAY I'M DOING THIS SUCKS I THINK. I DON'T KNOW HOW ELSE TO DO IT JARED PLEASE HELP MEEEEEEEEEEEE
-CURR_STOCK_PRICE = 1000 # this needs to be changed to whatever we initialize the stock price to
+class GameData:
+    def __init__(self, stock_generator, start_price, ):
+        self.stock_generator = stock_generator
+        self.stock_price = start_price
+        # cash held
+        # stock held
+        # total score
+
+    def update_price(self):
+        self.stock_price = next(self.stock_generator)
+
+    def buy(self):
+        '''TODO JOSUE/KYLER/DAVID: use this to build your buy/sell functions. For now it just prints the current stock price.'''
+        print(self.stock_price)
+
+    def sell(self):
+        '''TODO JOSUE/KYLER/DAVID: use this to build your buy/sell functions. For now it just prints the current stock price.'''
+        print(self.stock_price)
 
 def command(f, *args, **kwargs):
     '''allows passing of arguments when binding functions to tkinter buttons'''
     return lambda:f(*args, **kwargs)
 
-def buy():
-    '''
-    shows how to use CURR_STOCK_PRICE. it's a global variable that's updated to always reflect the current stock price.
-    use this to build your buy/sell functions. For now it just prints the current stock price.
-    '''
-    global CURR_STOCK_PRICE
-    
-    print(CURR_STOCK_PRICE)
-
-    pass
-
-def sell():
-    pass
-
 
 def main():
+    '''main execution'''
+
+    # Initialize stock_data, that holds all the values for the game
+    gen = stgen.stock_history(500) # generator that creates the stock price data
+    start_price = 1000
+    
+    game_data = GameData(gen, start_price, )
 
     # Initialize + configure the main window
     root = Tk()
+    def quit_me(): # define quit behavior
+        print('quit')
+        root.quit()
+        root.destroy()
+    root.protocol("WM_DELETE_WINDOW", quit_me)
     root.title("UVStocks")
     # root.configure(bg="green",)
 
@@ -61,37 +75,37 @@ def main():
 
     fig = Figure(figsize = (5, 5), dpi = 100)
 
-    xs = []
-    ys = []
-    data = stgen.stock_history(100)
+    xs = [] # x axis data, should be dates/times eventually. left empty for now. TODO
+    ys = [] # y axis data - will contain stock price values
 
     fig, ax = plt.subplots()
 
     canvas = FigureCanvasTkAgg(fig, master=root)
     canvas.get_tk_widget().pack()
 
-    def animate(i, xs, ys, data, ax):
+    def animate(i, xs, ys, ax):
         '''animate function to be called repeatedly to update the graph'''
-        global CURR_STOCK_PRICE
-        CURR_STOCK_PRICE = round(next(data), 2) # UPDATES THE GLOBAL STOCK PRICE
-        ys.append(CURR_STOCK_PRICE)
-        # print(CURR_STOCK_PRICE) # debugging. prints stock price every time it updates
-        ys = ys[-25:] # only show the last 25 values
+        # global game_data
+        game_data.update_price() # UPDATES THE GLOBAL STOCK PRICE
+        print(game_data.stock_price) ### DEBUG. prints stock price every time it updates
+
+        ys.append(game_data.stock_price)
 
         ax.clear()
+        ys = ys[-25:] # only show the last 25 values
         # ax.set_ylim(700,1300) # configuration of the graph goes here
         ax.plot(ys)
 
-    ani = FuncAnimation(fig, animate, fargs=(xs, ys, data, ax), interval=500) # change to 1000
+    ani = FuncAnimation(fig, animate, fargs=(xs, ys, ax), interval=500) # change to 1000
 
 
     # Build and place the buy/sell buttons frame
     btn_frm = Frame(root)
     btn_frm.pack()
 
-    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=buy)
+    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=game_data.buy)
     b1.pack(side=LEFT, padx=50)
-    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=sell)
+    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=game_data.sell)
     b2.pack(side=RIGHT, padx=50)
 
 
