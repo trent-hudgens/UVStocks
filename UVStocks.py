@@ -1,30 +1,31 @@
 from tkinter import *
 from PIL import ImageTk, Image  
-import stock_generator as stgen
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-def dummy():
-    '''placeholder for button commands.'''
+from game_data import StockData
+from buy_sell import buy, sell
 
-    #the following code is used to clear and then restore the default value, "amount", to the inputAmount entry
-    #it should be run when buy or sell is clicked
-    #note: inputAmount is defined after this which may cause issues
-    #amountStr = str(inputAmount.get())
-    #if amountStr == "":
-        #inputAmount.insert(0, "Amount")
-        #root.focus()
 
-    pass
+def command(f, *args, **kwargs):
+    '''allows passing of arguments when binding functions to tkinter buttons'''
+    return lambda:f(*args, **kwargs)
 
 
 def main():
+    '''main execution'''
+
+    stock_data = StockData()
 
     # Initialize + configure the main window
     root = Tk()
+    def quit_me(): # define quit behavior
+        print('quit')
+        root.quit()
+        root.destroy()
+    root.protocol("WM_DELETE_WINDOW", quit_me)
     root.title("UVStocks")
     # root.configure(bg="green",)
 
@@ -33,7 +34,7 @@ def main():
     logo_frm = Frame(root)
     logo_frm.pack()
 
-    img = Image.open("UVStocks_logo.png")
+    img = Image.open("images/UVStocks-logo.png")
     img = img.resize((200, 50)) # Resize image
     UVlogo = ImageTk.PhotoImage(img)
     Label(logo_frm, image=UVlogo).pack()
@@ -52,36 +53,37 @@ def main():
 
     fig = Figure(figsize = (5, 5), dpi = 100)
 
-    xs = []
-    ys = []
-    data = stgen.stock_history(100)
+    xs = [] # x axis data, should be dates/times eventually. left empty for now. TODO
+    ys = [] # y axis data - will contain stock price values
 
     fig, ax = plt.subplots()
 
     canvas = FigureCanvasTkAgg(fig, master=root)
     canvas.get_tk_widget().pack()
 
-    def animate(i, xs, ys, data, ax):
+    def animate(i, xs, ys, ax):
         '''animate function to be called repeatedly to update the graph'''
-        CURR_STOCK_PRICE = round(next(data), 2)
-        ys.append(CURR_STOCK_PRICE)
-        print(CURR_STOCK_PRICE)
-        ys = ys[-25:] # only show the last 25 values
+        # global stock_data
+        stock_data.update_price() # UPDATES THE GLOBAL STOCK PRICE
+        print(stock_data.stock_price) ### DEBUG. prints stock price every time it updates
+
+        ys.append(stock_data.stock_price)
 
         ax.clear()
+        ys = ys[-25:] # only show the last 25 values
         # ax.set_ylim(700,1300) # configuration of the graph goes here
         ax.plot(ys)
 
-    ani = FuncAnimation(fig, animate, fargs=(xs, ys, data, ax), interval=500) # change to 1000
+    ani = FuncAnimation(fig, animate, fargs=(xs, ys, ax), interval=500) # change to 1000
 
 
     # Build and place the buy/sell buttons frame
     btn_frm = Frame(root)
     btn_frm.pack()
 
-    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=dummy)
+    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=command(buy, stock_data))
     b1.pack(side=LEFT, padx=50)
-    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=dummy)
+    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=command(sell, stock_data))
     b2.pack(side=RIGHT, padx=50)
 
 
