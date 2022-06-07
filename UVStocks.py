@@ -77,6 +77,7 @@ def main():
                 labelValUpdater(str(total_money - total), str(stocks_owned + amount_stocks_to_buy))
         except:
             return print("Something went wrong try again")
+    
 
     def labelStockUpdater(stock_price):
         currentStockLabel.config(text="Current Stock Price: ")
