@@ -90,7 +90,7 @@ def main():
 
     ani = FuncAnimation(fig, animate, fargs=(xs, ys, ax), interval=500)  # change to 1000
 
-    # build a place a simple spacer between the graph and the buy and sell buttons
+    # build and place a simple spacer between the graph and the purchase/sell amount entry box
     Label(text="", fg="black").pack()
 
     # entry field for amount of stocks to buy or sell
@@ -143,7 +143,7 @@ def main():
     b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=command(sell, stock_data))
     b2.pack(side=RIGHT, padx=50)
 
-    # build a place a simple spacer between the buy and sell buttons and the score label
+    # build and place a simple spacer between the buy and sell buttons and the score label
     Label(text="", fg="black").pack()
 
     # build and place the total score frame
