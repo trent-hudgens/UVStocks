@@ -81,9 +81,9 @@ def main():
     btn_frm = Frame(root)
     btn_frm.pack()
 
-    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=command(buy, stock_data))
+    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=command(buy, stock_data)) # add other arguments. i'm assuming you use stock_data as the first argument here.
     b1.pack(side=LEFT, padx=50)
-    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=command(sell, stock_data))
+    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=command(sell, stock_data)) # add other arguments. i'm assuming you use stock_data as the first argument here.
     b2.pack(side=RIGHT, padx=50)
 
 
