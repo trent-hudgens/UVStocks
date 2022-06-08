@@ -121,8 +121,9 @@ def main():
     def checkFunds(total_money, stocks_data, entry_val, stocks_owned, button_type):
         global wallet_amount
         global stocks_held
-        fundsOrNoFunds, updatedWallet, updatedStocks = buy(wallet_amount, stocks_data, entry_val, stocks_owned)
+        #fundsOrNoFunds, updatedWallet, updatedStocks = buy(wallet_amount, stocks_data, entry_val, stocks_owned)
         if button_type == 1:
+            fundsOrNoFunds, updatedWallet, updatedStocks = buy(wallet_amount, stocks_data, entry_val, stocks_owned)
             if fundsOrNoFunds == 1:
                 no_funds.config(text="Insufficent Funds")
             else:
@@ -132,7 +133,15 @@ def main():
                 labelValUpdater(str(round(wallet_amount, 2)), str(stocks_held))
 
         elif button_type == 2:
-            print("You clicked the sell button")
+            fundsOrNoFunds, updatedWallet, updatedStocks = sell(wallet_amount, stocks_data, entry_val, stocks_owned)
+            if fundsOrNoFunds == 1:
+                no_funds.config(text="Insufficent stocks")
+            else:
+                no_funds.config(text="")
+                wallet_amount = updatedWallet
+                stocks_held = stocks_owned - entry_val
+                labelValUpdater(str(round(wallet_amount, 2)), str(stocks_held))
+
 
         else:
             print("There was a problem please try again")
@@ -141,7 +150,9 @@ def main():
                                                                                          stock_data.stock_price,
                                                                                          clickInput(), stocks_held, 1))
     b1.pack(side=LEFT, padx=50)
-    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=command(sell, stock_data))
+    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=lambda: checkFunds(wallet_amount,
+                                                                                         stock_data.stock_price,
+                                                                                         clickInput(), stocks_held, 2))
     b2.pack(side=RIGHT, padx=50)
 
     # build and place a simple spacer between the buy and sell buttons and the score label

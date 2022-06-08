@@ -16,12 +16,12 @@ def buy(wallet_amount, stock_data, entryVal, stocks_owned):
 def sell(wallet_amount, stock_data, entryVal, stocks_owned):
     try:
         total = stock_data * entryVal
-        if total > wallet_amount:
-            return 1, wallet_amount, stocks_owned
-
+        if stocks_owned < entryVal:
+            print("not enough stocks")
+            return 1, wallet_amount, stocks_owned 
         else:
-            updatedWallet = wallet_amount - total
-            updatedStocks = stocks_owned + entryVal
+            updatedWallet = wallet_amount + total
+            updatedStocks = stocks_owned - entryVal
             return 0, updatedWallet, updatedStocks
     except:
         return print("Something went wrong try again")
