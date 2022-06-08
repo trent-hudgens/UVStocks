@@ -105,6 +105,7 @@ def main():
         amountStr = str(inputAmount.get())
         if amountStr == "Amount":
             inputAmount.delete(0, 'end')
+            return 0
         return int(amountStr)
 
     inputAmount.bind("<Button-1>", clickInput)
@@ -127,7 +128,7 @@ def main():
             else:
                 no_funds.config(text="")
                 wallet_amount = updatedWallet
-                stocks_held = stocks_owned + 1
+                stocks_held = stocks_owned + entry_val
                 labelValUpdater(str(round(wallet_amount, 2)), str(stocks_held))
 
         elif button_type == 2:
