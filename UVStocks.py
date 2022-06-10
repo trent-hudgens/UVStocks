@@ -54,7 +54,7 @@ def main():
 
     fig = Figure(figsize=(5, 5), dpi=100)
 
-    xs = []  # x axis data, should be dates/times eventually. left empty for now. TODO
+    xs = []  # x axis data, should be dates/times eventually. left empty for now.
     ys = []  # y axis data - will contain stock price values
 
     fig, ax = plt.subplots()
@@ -74,17 +74,17 @@ def main():
 
     labelValUpdater(str(wallet_amount), str(stocks_held))
 
-    def animate(i, x_axis, y_axis, ax):
+    def animate(i, x_axis, y_axis, axis):
         """animate function to be called repeatedly to update the graph"""
         # global stock_data
         stock_data.update_price()  # UPDATES THE GLOBAL STOCK PRICE
         print(stock_data.stock_price)  # DEBUG. prints stock price every time it updates
         y_axis.append(stock_data.stock_price)
 
-        ax.clear()
+        axis.clear()
         y_axis = y_axis[-25:]  # only show the last 25 values
         # ax.set_ylim(700,1300) # configuration of the graph goes here
-        ax.plot(y_axis)
+        axis.plot(y_axis)
 
         labelStockUpdater(str(round(stock_data.stock_price, 2)))
 
@@ -120,27 +120,34 @@ def main():
     def checkFunds(total_money, stocks_data, entry_val, stocks_owned, button_type):
         global wallet_amount
         global stocks_held
-        fundsOrNoFunds, updatedWallet, updatedStocks = buy(wallet_amount, stocks_data, entry_val, stocks_owned)
         if button_type == 1:
+            fundsOrNoFunds, updatedWallet, updatedStocks = buy(wallet_amount, stocks_data, entry_val, stocks_owned)
             if fundsOrNoFunds == 1:
                 no_funds.config(text="Insufficent Funds")
             else:
                 no_funds.config(text="")
                 wallet_amount = updatedWallet
-                stocks_held = stocks_owned + 1
+                stocks_held = stocks_owned + entry_val
                 labelValUpdater(str(round(wallet_amount, 2)), str(stocks_held))
 
         elif button_type == 2:
-            print("You clicked the sell button")
-
-        else:
-            print("There was a problem please try again")
+            fundsOrNoFunds, updatedWallet, updatedStocks = sell(wallet_amount, stocks_data, entry_val, stocks_owned)
+            if fundsOrNoFunds == 1:
+                no_funds.config(text="Insufficent stocks")
+            else:
+                no_funds.config(text="")
+                wallet_amount = updatedWallet
+                stocks_held = stocks_owned - entry_val
+                labelValUpdater(str(round(wallet_amount, 2)), str(stocks_held))
 
     b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=lambda: checkFunds(wallet_amount,
                                                                                          stock_data.stock_price,
                                                                                          clickInput(), stocks_held, 1))
     b1.pack(side=LEFT, padx=50)
-    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=command(sell, stock_data))
+
+    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=lambda: checkFunds(wallet_amount,
+                                                                                          stock_data.stock_price,
+                                                                                          clickInput(), stocks_held, 2))
     b2.pack(side=RIGHT, padx=50)
 
     # build and place a simple spacer between the buy and sell buttons and the score label

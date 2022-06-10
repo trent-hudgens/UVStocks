@@ -1,4 +1,4 @@
-'''the game data including the stock data and others :)'''
+"""the game data including the stock data and others :)"""
 
 from stock_generator import stock_history
 
@@ -13,6 +13,11 @@ class StockData:
 
     def get_price(self):
         return self.stock_price
+
+
+class Player:
+    def __init__(self, player_name, wallet_total, stocks_held, player_score):
+        pass
 
 
 if __name__ == "__main__":
