@@ -1,8 +1,7 @@
 __pycache__/**/*
-.idea/workspace.xml
-*.xml
 *.xml
 *.json
 *.pyc
 *.sqlite
-.vs/UVStocks/v16/.suo
+*.suo
+*.pyc
