@@ -16,9 +16,36 @@ class StockData:
 
 
 class Player:
-    def __init__(self, player_name, wallet_total, stocks_held, player_score):
-        pass
+    def __init__(self, stock, name="default-name", wallet=3000, stocks_held=0, score=3000):
 
+        # maybe not have Player have a stock.... don't know what to do here
+        self.stock = stock
 
-if __name__ == "__main__":
-    pass
+        self.name = name
+        self.wallet = wallet
+        self.stocks_held = stocks_held
+        self.score = score
+
+    def buy(self, get_input):
+        desired_stocks = get_input()
+        if self.check_funds(desired_stocks):
+            self.wallet -= (desired_stocks * self.stock.stock_price)
+            self.stocks_held += desired_stocks
+            # TODO RECALCULATE THE TOTAL SCORE
+        else:
+            print("You can't afford to buy that many stocks.")
+            # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
+
+    def sell(self, get_input):
+        desired_stocks = get_input()
+        if desired_stocks <= self.stocks_held:
+            self.wallet += (desired_stocks * self.stock.stock_price)
+            self.stocks_held -= desired_stocks
+            # TODO RECALCULATE THE TOTAL SCORE
+        else:
+            print("You are trying to sell too many stocks.")
+            # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
+
+    def check_funds(self, desired_stocks):
+        stock_price = self.stock.get_price()
+        return (desired_stocks * stock_price) < self.wallet
