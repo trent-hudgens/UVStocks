@@ -17,6 +17,7 @@ def main():
 
     stock_data = StockData()
     player = Player(stock=stock_data)
+    player_stocks_label = None
 
     # Initialize + configure the main window
     root = Tk()
@@ -35,10 +36,10 @@ def main():
     logo_frm = Frame(root)
     logo_frm.pack()
 
-    img = Image.open("images/UVStocks-logo.png")
-    img = img.resize((200, 50))  # Resize image
-    UVlogo = ImageTk.PhotoImage(img)
-    Label(logo_frm, image=UVlogo).pack()
+    # img = Image.open("images/UVStocks-logo.png")
+    # img = img.resize((200, 50))  # Resize image
+    # UVlogo = ImageTk.PhotoImage(img)
+    # Label(logo_frm, image=UVlogo).pack()
 
 
     # build and place the labels for cash, shares held, and current stock price
@@ -60,6 +61,9 @@ def main():
 
     def totalCashLabelUpdater(curr_cash_amount):
         totalCash.config(text=f"Total Cash: {round(float(curr_cash_amount), 2)}")
+
+    def score_label_updater(score):
+        player_stocks_label.config(text=f"Scored: {round(float(score), 2)}")
 
 
     # Build and place the stock graph frame
@@ -93,6 +97,8 @@ def main():
         stockLabelUpdater(stock_data.stock_price)
         numStocksLabelUpdater(str(player.stocks_held))
         totalCashLabelUpdater(str(player.wallet))
+        if player_stocks_label != None:
+            score_label_updater(player.update_score(player, stock_data.stock_price))
 
     ani = FuncAnimation(fig, animate, fargs=(xs, ys, ax), interval=500)  # change to 1000
 
@@ -136,13 +142,14 @@ def main():
 
     # build and place the total score frame
     score_frm = Frame(root)
-    Label(score_frm, text="SCORE: 0", fg="black", anchor="w", font=("Arial", 12)).pack(side=LEFT)
+    player_stocks_label = Label(score_frm, text="SCORE: 0", fg="black", anchor="w", font=("Arial", 12), )
+    player_stocks_label.pack(side=LEFT, pady = 10)
 
     score_frm.pack()
 
     # TODO DO THIS THE RIGHT WAY, DONT USE FRAME AS SPACER
     # build and place a simple spacer between the score label and the bottom of the page
-    Label(text="", fg="black").pack()
+    # Label(text="", fg="black").pack()
 
     root.mainloop()
 
