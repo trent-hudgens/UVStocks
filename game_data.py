@@ -1,7 +1,6 @@
 """the game data including the stock data and others :)"""
 
 from stock_generator import stock_history
-import csv
 
 
 class StockData:
@@ -27,25 +26,29 @@ class Player:
         self.stocks_held = stocks_held
         self.score = score
 
-    def buy(self, get_input):
+    def buy(self, get_input, no_funds):
         desired_stocks = get_input()
         if self.check_funds(desired_stocks):
             self.wallet -= (desired_stocks * self.stock.stock_price)
             self.stocks_held += desired_stocks
+            no_funds.config(text="")
             # TODO RECALCULATE THE TOTAL SCORE
         else:
             print("You can't afford to buy that many stocks.")
+            no_funds.config(text="Insufficent Funds")
+            return no_funds
             # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
-            return int(1)
 
-    def sell(self, get_input):
+    def sell(self, get_input, no_funds):
         desired_stocks = get_input()
         if desired_stocks <= self.stocks_held:
             self.wallet += (desired_stocks * self.stock.stock_price)
             self.stocks_held -= desired_stocks
+            no_funds.config(text="")
             # TODO RECALCULATE THE TOTAL SCORE
         else:
             print("You are trying to sell too many stocks.")
+            no_funds.config(text="Insufficent Stock Amount")
             # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
             return int(1)
 
