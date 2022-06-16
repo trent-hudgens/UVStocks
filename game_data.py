@@ -1,6 +1,7 @@
 """the game data including the stock data and others :)"""
 
 from stock_generator import stock_history
+import csv
 
 
 class StockData:
@@ -35,6 +36,7 @@ class Player:
         else:
             print("You can't afford to buy that many stocks.")
             # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
+            return int(1)
 
     def sell(self, get_input):
         desired_stocks = get_input()
@@ -45,6 +47,7 @@ class Player:
         else:
             print("You are trying to sell too many stocks.")
             # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
+            return int(1)
 
     def check_funds(self, desired_stocks):
         stock_price = self.stock.get_price()
