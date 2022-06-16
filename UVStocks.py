@@ -118,27 +118,16 @@ def main():
     no_funds = Label(text="", fg="black")
     no_funds.pack()
 
-    # This allows for the an to show when the player doesn't have enough funds or is trying to sell too many stocks
-    def noFunds(entry_label, button_num):
-        if button_num == 0:
-            canBuy = player.buy(entry_label)
-            if canBuy == 1:
-                no_funds.config(text="Insufficent Funds")
-        else:
-            canSell = player.sell(entry_label)
-            if canSell == 1:
-                no_funds.config(text="Insufficent Numbers of Stocks Owned")
-
     # Build and place the buy/sell buttons frame
     btn_frm = Frame(root)
     btn_frm.pack()
 
     b1 = Button(master=btn_frm, text="Buy", padx=40, pady=10, fg="white", bg="#2e8bc0", font="Arial 14 bold",
-                command=command(noFunds, getInput, 0))
+                command=command(player.buy, getInput, no_funds))
     b1.pack(side=LEFT, padx=50, pady=10)
 
     b2 = Button(master=btn_frm, text="Sell", padx=40, pady=10, fg="white", bg="#2e8bc0", font="Arial 14 bold",
-                command=command(noFunds, getInput, 1))
+                command=command(player.sell, getInput, no_funds))
     b2.pack(side=RIGHT, padx=50, pady=10)
 
     # build and place the total score frame
