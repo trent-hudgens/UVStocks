@@ -17,8 +17,6 @@ def main():
 
     stock_data = StockData()
     player = Player(stock=stock_data)
-    player_stocks_label = None
-
 
     # Initialize + configure the main window
     root = Tk()
@@ -32,16 +30,14 @@ def main():
     root.title("UVStocks")
     # root.configure(bg="green",)
 
-
     # Build and place the logo frame
     logo_frm = Frame(root)
     logo_frm.pack()
 
-    # img = Image.open("images/UVStocks-logo.png")
-    # img = img.resize((200, 50))  # Resize image
-    # UVlogo = ImageTk.PhotoImage(img)
-    # Label(logo_frm, image=UVlogo).pack()
-
+    img = Image.open("images/UVStocks-logo.png")
+    img = img.resize((200, 50))  # Resize image
+    UVlogo = ImageTk.PhotoImage(img)
+    Label(logo_frm, image=UVlogo).pack()
 
     # build and place the labels for cash, shares held, and current stock price
     cash_shares_frm = Frame(root)
@@ -63,10 +59,6 @@ def main():
     def totalCashLabelUpdater(curr_cash_amount):
         totalCash.config(text=f"Total Cash: {round(float(curr_cash_amount), 2)}")
 
-
-    def score_label_updater(score):
-        player_stocks_label.config(text=f"Scored: {round(float(score), 2)}")
-      
     # Build and place the stock graph frame
     graph_frm = Frame(root)
     graph_frm.pack()
@@ -84,9 +76,7 @@ def main():
     numStocksLabelUpdater(str(player.stocks_held))
     totalCashLabelUpdater(str(player.wallet))
 
-    def animate(i, x_axis, y_axis, axis): # i don't know why 'i' has to be supplied. ???
-
-
+    def animate(i, x_axis, y_axis, axis):  # i don't know why 'i' has to be supplied. ???
         """animate function to be called repeatedly to update the graph"""
         stock_data.update_price()
         # print(stock_data.stock_price)  # DEBUG. prints stock price every time it updates
@@ -100,9 +90,6 @@ def main():
         stockLabelUpdater(stock_data.stock_price)
         numStocksLabelUpdater(str(player.stocks_held))
         totalCashLabelUpdater(str(player.wallet))
-        if player_stocks_label != None:
-            score_label_updater(player.update_score(player, stock_data.stock_price))
-
 
     ani = FuncAnimation(fig, animate, fargs=(xs, ys, ax), interval=500)  # change to 1000
 
@@ -119,16 +106,15 @@ def main():
 
     # function to grab number of stocks to buy/sell from user
     def getInput(*args):
-    Buy-Sell-Functionality-KD
         amountStr = str(inputAmount.get())
         if amountStr == "Amount":
             inputAmount.delete(0, 'end')
             amountStr = 0
         return int(amountStr)
+
     inputAmount.bind("<Button-1>", getInput)
 
     # Build and place the no funds label when the user doesn't have enough money to buy a stock
-    # TODO THIS ISNT WORKING RIGHT NOW. PLS FIX
     no_funds = Label(text="", fg="black")
     no_funds.pack()
 
@@ -146,7 +132,6 @@ def main():
     # Build and place the buy/sell buttons frame
     btn_frm = Frame(root)
     btn_frm.pack()
-
 
     b1 = Button(master=btn_frm, text="Buy", padx=40, pady=10, fg="white", bg="#2e8bc0", font="Arial 14 bold",
                 command=command(noFunds, getInput, 0))
