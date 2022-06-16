@@ -19,6 +19,7 @@ def main():
     player = Player(stock=stock_data)
     player_stocks_label = None
 
+
     # Initialize + configure the main window
     root = Tk()
 
@@ -44,11 +45,11 @@ def main():
 
     # build and place the labels for cash, shares held, and current stock price
     cash_shares_frm = Frame(root)
-    currentStockLabel = Label(cash_shares_frm, text="", fg="black", anchor="w")
-    currentStockLabel.pack(side=LEFT)
-    totalCash = Label(cash_shares_frm, text="", fg="black", anchor="w")
+    currentStockLabel = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
+    currentStockLabel.pack(side=LEFT, padx=50, ipady=10)
+    totalCash = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
     totalCash.pack(side=LEFT, padx=50)
-    totalStocks = Label(cash_shares_frm, text="", fg="black", anchor="e")
+    totalStocks = Label(cash_shares_frm, text="", fg="black", anchor="e", font="Arial 10 bold")
     totalStocks.pack(side=RIGHT, padx=50)
     cash_shares_frm.pack()
 
@@ -62,10 +63,10 @@ def main():
     def totalCashLabelUpdater(curr_cash_amount):
         totalCash.config(text=f"Total Cash: {round(float(curr_cash_amount), 2)}")
 
+
     def score_label_updater(score):
         player_stocks_label.config(text=f"Scored: {round(float(score), 2)}")
-
-
+      
     # Build and place the stock graph frame
     graph_frm = Frame(root)
     graph_frm.pack()
@@ -84,6 +85,8 @@ def main():
     totalCashLabelUpdater(str(player.wallet))
 
     def animate(i, x_axis, y_axis, axis): # i don't know why 'i' has to be supplied. ???
+
+
         """animate function to be called repeatedly to update the graph"""
         stock_data.update_price()
         # print(stock_data.stock_price)  # DEBUG. prints stock price every time it updates
@@ -100,6 +103,7 @@ def main():
         if player_stocks_label != None:
             score_label_updater(player.update_score(player, stock_data.stock_price))
 
+
     ani = FuncAnimation(fig, animate, fargs=(xs, ys, ax), interval=500)  # change to 1000
 
     # build and place a simple spacer between the graph and the purchase/sell amount entry box
@@ -109,47 +113,53 @@ def main():
     input_amount_frm = Frame(root)
     input_amount_frm.pack()
 
-    inputAmount = Entry(input_amount_frm, bg="white", fg="black", width=100)
+    inputAmount = Entry(input_amount_frm, bg="white", fg="black", width=58, font="Arial 15")
     inputAmount.pack(side=LEFT)
     inputAmount.insert(0, "Amount")
 
     # function to grab number of stocks to buy/sell from user
-    def getInput():
+    def getInput(*args):
+    Buy-Sell-Functionality-KD
         amountStr = str(inputAmount.get())
         if amountStr == "Amount":
             inputAmount.delete(0, 'end')
             amountStr = 0
         return int(amountStr)
+    inputAmount.bind("<Button-1>", getInput)
 
     # Build and place the no funds label when the user doesn't have enough money to buy a stock
     # TODO THIS ISNT WORKING RIGHT NOW. PLS FIX
     no_funds = Label(text="", fg="black")
     no_funds.pack()
 
+    # This allows for the an to show when the player doesn't have enough funds or is trying to sell too many stocks
+    def noFunds(entry_label, button_num):
+        if button_num == 0:
+            canBuy = player.buy(entry_label)
+            if canBuy == 1:
+                no_funds.config(text="Insufficent Funds")
+        else:
+            canSell = player.sell(entry_label)
+            if canSell == 1:
+                no_funds.config(text="Insufficent Numbers of Stocks Owned")
+
     # Build and place the buy/sell buttons frame
     btn_frm = Frame(root)
     btn_frm.pack()
 
-    b1 = Button(master=btn_frm, text="Buy", padx=50, pady=10, command=command(player.buy, getInput))
-    b1.pack(side=LEFT, padx=50)
 
-    b2 = Button(master=btn_frm, text="Sell", padx=50, pady=10, command=command(player.sell, getInput))
-    b2.pack(side=RIGHT, padx=50)
+    b1 = Button(master=btn_frm, text="Buy", padx=40, pady=10, fg="white", bg="#2e8bc0", font="Arial 14 bold",
+                command=command(noFunds, getInput, 0))
+    b1.pack(side=LEFT, padx=50, pady=10)
 
-    # TODO DO THIS THE RIGHT WAY, DONT USE FRAME AS SPACER
-    # build and place a simple spacer between the buy and sell buttons and the score label
-    Label(text="", fg="black").pack()
+    b2 = Button(master=btn_frm, text="Sell", padx=40, pady=10, fg="white", bg="#2e8bc0", font="Arial 14 bold",
+                command=command(noFunds, getInput, 1))
+    b2.pack(side=RIGHT, padx=50, pady=10)
 
     # build and place the total score frame
     score_frm = Frame(root)
-    player_stocks_label = Label(score_frm, text="SCORE: 0", fg="black", anchor="w", font=("Arial", 12), )
-    player_stocks_label.pack(side=LEFT, pady = 10)
-
+    Label(score_frm, text="SCORE: 0", fg="black", anchor="w", pady=10, font="Arial 14 bold").pack(side=LEFT)
     score_frm.pack()
-
-    # TODO DO THIS THE RIGHT WAY, DONT USE FRAME AS SPACER
-    # build and place a simple spacer between the score label and the bottom of the page
-    # Label(text="", fg="black").pack()
 
     root.mainloop()
 

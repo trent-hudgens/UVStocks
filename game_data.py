@@ -1,4 +1,4 @@
-"""the game data including the stock data and others :)"""
+"""the game data including the stock data and others :)"""https://github.com/trent-hudgens/UVStocks/pull/16/conflict?name=game_data.py&ancestor_oid=aee5b76859a784ae7612b9822c79a64af6fed18e&base_oid=b0b84f3a2a9dd0dcbcd9ac56addefd705f1e6d60&head_oid=1f83dab3dff896172016a7c922a3726cf10a4384
 
 from stock_generator import stock_history
 import csv
@@ -19,6 +19,7 @@ class StockData:
 class Player:
     def __init__(self, stock, name="defaultname", wallet=3000, stocks_held=0, score=3000):
 
+
         # maybe not have Player have a stock.... don't know what to do here
         self.stock = stock
 
@@ -26,11 +27,11 @@ class Player:
         self.wallet = wallet
         self.stocks_held = stocks_held
         self.score = score
+
         records = self.created_records(self.name)
 
-    
-    def buy(self, getInput):
-        desired_stocks = getInput()
+    def buy(self, get_input):
+        desired_stocks = get_input()
         if self.check_funds(desired_stocks):
             self.wallet -= (desired_stocks * self.stock.stock_price)
             self.stocks_held += desired_stocks
@@ -42,10 +43,18 @@ class Player:
     
     def sell(self, getInput):
         desired_stocks = getInput()
+        else:
+            print("You can't afford to buy that many stocks.")
+            # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
+
+    def sell(self, get_input):
+        desired_stocks = get_input()
+        Buy-Sell-Functionality-KD
         if desired_stocks <= self.stocks_held:
             self.wallet += (desired_stocks * self.stock.stock_price)
             self.stocks_held -= desired_stocks
             # TODO RECALCULATE THE TOTAL SCORE
+
             self.update_score_record(self.name, desired_stocks, self.stock.stock_price, 'Sell')
         else:
             print("You are trying to sell too many stocks.")
@@ -104,3 +113,11 @@ class Player:
     def get_score(self):
         return self.score
         
+
+        else:
+            print("You are trying to sell too many stocks.")
+            # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
+
+    def check_funds(self, desired_stocks):
+        stock_price = self.stock.get_price()
+        return (desired_stocks * stock_price) < self.wallet
