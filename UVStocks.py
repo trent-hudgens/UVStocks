@@ -15,6 +15,10 @@ def show_frame(frame):
     """raises the inputted frame to the top so it's visible"""
     frame.tkraise()
 
+def submit_name(player, entry, stock_frame):
+    player.name = entry.get()
+    stock_frame.tkraise()
+
 
 def main():
     """main execution"""
@@ -40,6 +44,7 @@ def main():
     title_frame = Frame(root)
     stock_frame = Frame(root)
     highscores_frame = Frame(root)
+    name_prompt_frame = Frame(root)
 
     #stacking page frames on top of each other
     for frame in (title_frame, stock_frame, highscores_frame):
@@ -47,6 +52,7 @@ def main():
 
     show_frame(title_frame)
 
+    #begin title page
     title_logo_frm = Frame(title_frame)
     title_logo_frm.pack()
 
@@ -59,7 +65,7 @@ def main():
     #buttons to go to the game or the leaderboard
     btn_title_frame = Frame(title_frame)
 
-    titleB1 = Button(master=btn_title_frame, text="play", padx=50, pady=20, command=command(show_frame, stock_frame))
+    titleB1 = Button(master=btn_title_frame, text="play", padx=50, pady=20, command=command(show_frame, name_prompt_frame))
     titleB1.pack(side=LEFT, padx=50)
 
     titleB2 = Button(master=btn_title_frame, text="leaderboard", padx=25, pady=20, command=command(show_frame, highscores_frame))
@@ -68,6 +74,23 @@ def main():
     btn_title_frame.pack()
 
 
+    #begin name prompt page
+    name_prompt_frame.place(x=150, y=420, width=400, height=100)
+    np_label_frame = Frame(name_prompt_frame)
+    np_label = Label(np_label_frame, text="input name", fg="black", font="Arial 15")
+    np_label.pack()
+    np_label_frame.pack()
+    np_entry_frame = Frame(name_prompt_frame)
+    np_entry = Entry(np_entry_frame, bg="white", fg="black", width=25, font="Arial 15")
+    np_entry.pack(side=LEFT)
+    np_entry_frame.pack()
+    np_button_frame = Frame(name_prompt_frame)
+    np_button = Button(np_button_frame, text="submit", fg="black", font="Arial 15", command=command(submit_name, player, np_entry, stock_frame))
+    np_button.pack()
+    np_button_frame.pack()
+
+
+    #begin stock page
     # Build and place the logo frame
     logo_frm = Frame(stock_frame)
     logo_frm.pack()
