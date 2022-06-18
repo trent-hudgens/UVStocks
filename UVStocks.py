@@ -11,16 +11,19 @@ def command(f, *args, **kwargs):
 class SplashScreen:
     def __init__(self, master):
 
+        self.splash_screen_frame = Frame(master) # this solution sucks
+        self.splash_screen_frame.pack()
+
         # logo (didn't use frame, just packed it into master)
         path = "images/uvstocksSplashLogo.png"
         pil_img = Image.open(path).resize((600, 675))
         tk_img = ImageTk.PhotoImage(pil_img)
-        logo_label = Label(master, image=tk_img)
+        logo_label = Label(self.splash_screen_frame, image=tk_img)
         logo_label.pack()
         logo_label.photo = tk_img
 
         # frame for buttons to start game and display leaderboard
-        btn_title_frame = Frame(master)
+        btn_title_frame = Frame(self.splash_screen_frame)
         btn_title_frame.pack()
 
         titleB1 = Button(master=btn_title_frame, text="play", padx=50, pady=20, command=self.name_prompt)
@@ -33,6 +36,8 @@ class SplashScreen:
         prompt = NamePromptWindow()
 
     def show_high_scores(self):
+        # THIS FUNCTION JUST TESTS DESTROYING THE FRAME FOR NOW
+        self.splash_screen_frame.destroy()
         pass
 
 class NamePromptWindow(Toplevel):
