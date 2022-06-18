@@ -1,5 +1,6 @@
 """the game data including the stock data and others :)"""
 from stock_generator import stock_history
+import copy
 import csv
 
 
@@ -16,7 +17,7 @@ class StockData:
 
 
 class Player:
-    def __init__(self, stock, name="default-name", wallet=5000, stocks_held=0, score=3000):
+    def __init__(self, stock, name="default-name", wallet=5000, stocks_held=0, score=None):
 
         # maybe not have Player have a stock.... don't know what to do here
         self.stock = stock
@@ -24,21 +25,20 @@ class Player:
         self.name = name
         self.wallet = wallet
         self.stocks_held = stocks_held
-        self.score = score
+        self.score = copy.copy(wallet) # this is sus
 
     def buy(self, get_input, no_funds):
         desired_stocks = get_input()
         if self.check_funds(desired_stocks):
             self.wallet -= (desired_stocks * self.stock.stock_price)
             self.stocks_held += desired_stocks
-            no_funds.config(text="")
-            # TODO RECALCULATE THE TOTAL SCORE
+            no_funds.config(text="") # TODO MAYBE DO ALL THE NO_FUNDS STUFF WITHIN check_funds?
+
         else:
             print("You can't afford to buy that many stocks.")
             no_funds.config(text="Insufficent Funds")
-            return no_funds
             # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
-            return int(1)
+            return no_funds
 
     def sell(self, get_input, no_funds):
         desired_stocks = get_input()
@@ -46,7 +46,7 @@ class Player:
             self.wallet += (desired_stocks * self.stock.stock_price)
             self.stocks_held -= desired_stocks
             no_funds.config(text="")
-            # TODO RECALCULATE THE TOTAL SCORE
+
         else:
             print("You are trying to sell too many stocks.")
             no_funds.config(text="Insufficent Stock Amount")
@@ -56,5 +56,11 @@ class Player:
     def check_funds(self, desired_stocks):
         stock_price = self.stock.get_price()
         return (desired_stocks * stock_price) < self.wallet
+    
+    def calc_score(self):
+        # maybe do this within the updater in UVStocks.py..... TODO Decide what to do
+        self.score = self.wallet + (self.stock.get_price() * self.stocks_held)
+        return self.score
+
 
 

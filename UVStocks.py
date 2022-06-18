@@ -7,6 +7,15 @@ from matplotlib.animation import FuncAnimation
 from game_data import Player, StockData
 
 
+
+# TODO DIAGNOSE
+
+# Exception in Tkinter callback
+# Traceback (most recent call last):
+#   File "C:\Users\Trent Hudgens\AppData\Local\Programs\Python\Python310\lib\tkinter\__init__.py", line 1921, in __call__
+#     return self.func(*args)
+# TypeError: command.<locals>.<lambda>() takes 0 positional arguments but 1 was given
+
 def command(f, *args, **kwargs):
     """allows passing of arguments when binding functions to tkinter buttons"""
     return lambda: f(*args, **kwargs)
@@ -42,7 +51,7 @@ class SplashScreen(Frame):
 
         Frame.__init__(self, master)
 
-        # logo frame
+        # logo
         path = "images/uvstocksSplashLogo.png"
         pil_img = Image.open(path).resize((600, 675))
         tk_img = ImageTk.PhotoImage(pil_img)
@@ -54,12 +63,12 @@ class SplashScreen(Frame):
         self.btn_title_frame = Frame(self)
         self.btn_title_frame.pack()
 
-        self.titleB1 = Button(master=self.btn_title_frame, text="play", padx=50, pady=20, command=self.open_name_prompt)
-        self.titleB1.pack(side=LEFT) #, padx=50)
+        self.titleB1 = Button(master=self.btn_title_frame, text="Play", padx=50, pady=20, command=self.open_name_prompt)
+        self.titleB1.pack(side=LEFT, padx=50)
 
-        self.titleB2 = Button(master=self.btn_title_frame, text="leaderboard", padx=25, pady=20, 
+        self.titleB2 = Button(master=self.btn_title_frame, text="Leaderboard", padx=25, pady=20, 
                               command=command(master.switch_frame, Leaderboard))
-        self.titleB2.pack(side=RIGHT) #, padx=50)
+        self.titleB2.pack(side=RIGHT, padx=50)
 
     def open_name_prompt(self):
         # NamePromptWindow is an attribute of SplashScreen for now ???
@@ -103,15 +112,15 @@ class Game(Frame):
         # initialize the game's stock data and player data. the way this works
         # is subject to change, not sure if this is the best thing
         self.stock_data = StockData()
-        self.player = Player(stock=self.stock_data)
+        self.player = Player(stock=self.stock_data) # TODO PASS IN PLAYER NAME FROM NAMEPROMPTWINDOW
 
-        # logo
+        # build and place the logo
         img = Image.open("images/UVStocks-logo.png")
         img = img.resize((200, 50))  # Resize image
         UVlogo = ImageTk.PhotoImage(img)
         logo_label = Label(self, image=UVlogo)
-        logo_label.pack()
         logo_label.photo = UVlogo
+        logo_label.pack()
 
         # build and place the labels for cash, shares held, and current stock price
         cash_shares_frm = Frame(self)
@@ -126,7 +135,7 @@ class Game(Frame):
         self.totalStocks = Label(cash_shares_frm, text="", fg="black", anchor="e", font="Arial 10 bold")
         self.totalStocks.pack(side=RIGHT, padx=50)
 
-        # Build and place the stock graph
+        # build and place the stock graph
         x_axis = []  # x axis data, should be dates/times eventually. left empty for now.
         y_axis = []  # y axis data - will contain stock price values
 
@@ -149,20 +158,21 @@ class Game(Frame):
             self.stockLabelUpdater(self.stock_data.stock_price)
             self.numStocksLabelUpdater(str(self.player.stocks_held))
             self.totalCashLabelUpdater(str(self.player.wallet))
+            self.scoreLabelUpdater(self.player.score)
 
         self.ani = FuncAnimation(fig, animate, fargs=(x_axis, y_axis, ax), interval=500)  # change to 1000
 
-        # Build and place the no funds label when the user doesn't have enough money to buy a stock
+        # build and place the no funds label when the user doesn't have enough money to buy a stock
         no_funds = Label(self, text="", fg="black")
         no_funds.pack()
 
-        # entry field for amount of stocks to buy or sell
+        # build and place the entry field for amount of stocks to buy or sell
         self.inputAmount = Entry(self, bg="white", fg="black", width=58, font="Arial 15")
         self.inputAmount.pack()
         self.inputAmount.insert(0, "Amount")
         self.inputAmount.bind("<Button-1>", command(self.getInput))
 
-        # buy/sell buttons
+        # build and place the buy/sell buttons
         btn_frm = Frame(self)
         btn_frm.pack(side=BOTTOM)
 
@@ -175,21 +185,27 @@ class Game(Frame):
         b2.pack(side=RIGHT, padx=50, pady=10)
 
         # total score
-        score_frm = Frame(self)
-        Label(score_frm, text="SCORE: 0", fg="black", anchor="w", pady=10, font="Arial 14 bold").pack(side=LEFT)
-        score_frm.pack()
+        self.scoreLabel = Label(self, text="SCORE: ", fg="black", anchor="w", pady=10, font="Arial 14 bold")
+        self.scoreLabel.pack()
 
+    # TODO seems like there is a better solution to having four separate updaters...
     def stockLabelUpdater(self, stock_price):
         self.currentStockLabel.config(text=f"Current Stock Price: {round(stock_price, 2)}")
 
-    def numStocksLabelUpdater(self, amount_stocks):
-        self.totalStocks.config(text=f"Number of Stocks Held: {round(int(amount_stocks), 2)}")
+    def numStocksLabelUpdater(self, stocks):
+        self.totalStocks.config(text=f"Number of Stocks Held: {round(int(stocks), 2)}")
 
     def totalCashLabelUpdater(self, curr_cash_amount):
         self.totalCash.config(text=f"Total Cash: {round(float(curr_cash_amount), 2)}")
 
+    def scoreLabelUpdater(self, score):
+        score = self.player.calc_score()
+        self.scoreLabel.config(text=f"Net worth: {round(float(score))}") # TODO figure out naming. Net worth makes the most sense to me
+
     def getInput(self):
         # function to grab number of stocks to buy/sell from user
+        # TODO this should be generic, and should just return the text inside the box when called,
+        # not just for the num stocks sell/buy feature.
         amountStr = str(self.inputAmount.get())
         if amountStr == "Amount":
             self.inputAmount.delete(0, 'end')
@@ -202,7 +218,7 @@ class Leaderboard(Frame):
 
         Frame.__init__(self, master)
 
-        # TODO COMPLETE LEADERBOARD
+        # TODO TODO TODO COMPLETE LEADERBOARD
         # currently is just a label with some placeholder text
         Frame.configure(self,bg='blue')
         Label(self, text="Leaderboard", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=5)
