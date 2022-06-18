@@ -4,7 +4,7 @@ import csv
 
 
 class StockData:
-    def __init__(self, history_size=500, start_price=1000):
+    def __init__(self, history_size=500, start_price=500):
         self.stock_generator = stock_history(history_size, start_price)
         self.stock_price = next(self.stock_generator)
 
@@ -16,7 +16,7 @@ class StockData:
 
 
 class Player:
-    def __init__(self, stock, name="default-name", wallet=3000, stocks_held=0, score=3000):
+    def __init__(self, stock, name="default-name", wallet=5000, stocks_held=0, score=3000):
 
         # maybe not have Player have a stock.... don't know what to do here
         self.stock = stock

@@ -20,10 +20,10 @@ class GUI(Tk):
         self.title("UVStocks")
         self.geometry("770x750")
 
-        self._frame = None
-
         # game switches to it's first frame, splashscreen
+        self._frame = None
         self.switch_frame = self.switch_frame(SplashScreen)
+
 
     def quit_me(self):  # define quit behavior
         self.quit()
@@ -67,7 +67,7 @@ class SplashScreen(Frame):
 
 
 class NamePromptWindow(Toplevel):
-    def __init__(self, master): # needs switch_frame for some reason
+    def __init__(self, master):
 
         Toplevel.__init__(self, master)
 
@@ -82,8 +82,6 @@ class NamePromptWindow(Toplevel):
 
         self.np_entry = Entry(self.name_prompt_frame, bg="white", fg="black", width=25, font="Arial 15")
         self.np_entry.pack()
-
-        print(type(master)) ### DEBUG
 
         self.np_button = Button(self.name_prompt_frame, text="submit", fg="black", font="Arial 15", 
                                 command=command(self.submit, master)) # TODO ????? switch isnteaD?
@@ -107,23 +105,13 @@ class Game(Frame):
         self.stock_data = StockData()
         self.player = Player(stock=self.stock_data)
 
-        # Build and place the logo frame
-        logo_frm = Frame(self)
-        logo_frm.pack()
-
+        # logo
         img = Image.open("images/UVStocks-logo.png")
         img = img.resize((200, 50))  # Resize image
         UVlogo = ImageTk.PhotoImage(img)
-        logo_label = Label(logo_frm, image=UVlogo)
+        logo_label = Label(self, image=UVlogo)
         logo_label.pack()
         logo_label.photo = UVlogo
-
-        # path = "images/uvstocksSplashLogo.png"
-        # pil_img = Image.open(path).resize((600, 675))
-        # tk_img = ImageTk.PhotoImage(pil_img)
-        # self.logo_label = Label(self, image=tk_img)
-        # self.logo_label.pack()
-        # self.logo_label.photo = tk_img # don't know why i have to do this
 
         # build and place the labels for cash, shares held, and current stock price
         cash_shares_frm = Frame(self)
@@ -138,26 +126,19 @@ class Game(Frame):
         self.totalStocks = Label(cash_shares_frm, text="", fg="black", anchor="e", font="Arial 10 bold")
         self.totalStocks.pack(side=RIGHT, padx=50)
 
-        # Build and place the stock graph frame
-        graph_frm = Frame(self)
-        graph_frm.pack()
-
-        xs = []  # x axis data, should be dates/times eventually. left empty for now.
-        ys = []  # y axis data - will contain stock price values
+        # Build and place the stock graph
+        x_axis = []  # x axis data, should be dates/times eventually. left empty for now.
+        y_axis = []  # y axis data - will contain stock price values
 
         fig, ax = plt.subplots()
 
         canvas = FigureCanvasTkAgg(fig, master=self)
         canvas.get_tk_widget().pack()
 
-        self.stockLabelUpdater(self.stock_data.stock_price)
-        self.numStocksLabelUpdater(str(self.player.stocks_held))
-        self.totalCashLabelUpdater(str(self.player.wallet))
-
         def animate(i, x_axis, y_axis, axis):  # i don't know why 'i' has to be supplied. ???
             """animate function to be called repeatedly to update the graph"""
             self.stock_data.update_price()
-            print(self.stock_data.stock_price)  # DEBUG. prints stock price every time it updates
+            # print(self.stock_data.stock_price)  # DEBUG. prints stock price every time it updates
             y_axis.append(self.stock_data.stock_price)
 
             axis.clear()
@@ -169,29 +150,21 @@ class Game(Frame):
             self.numStocksLabelUpdater(str(self.player.stocks_held))
             self.totalCashLabelUpdater(str(self.player.wallet))
 
-        ani = FuncAnimation(fig, animate, fargs=(xs, ys, ax), interval=500)  # change to 1000
-
-        # build and place a simple spacer between the graph and the purchase/sell amount entry box
-        # TODO do not do this. use x padding and y padding as arguments on other frames to space stuff out
-        Label(self, text="", fg="black").pack()
-
-        # entry field for amount of stocks to buy or sell
-        input_amount_frm = Frame(self)
-        input_amount_frm.pack()
-
-        self.inputAmount = Entry(input_amount_frm, bg="white", fg="black", width=58, font="Arial 15")
-        self.inputAmount.pack(side=LEFT)
-        self.inputAmount.insert(0, "Amount")
-
-        self.inputAmount.bind("<Button-1>", command(self.getInput))
+        self.ani = FuncAnimation(fig, animate, fargs=(x_axis, y_axis, ax), interval=500)  # change to 1000
 
         # Build and place the no funds label when the user doesn't have enough money to buy a stock
         no_funds = Label(self, text="", fg="black")
-        no_funds.pack(side=BOTTOM)
+        no_funds.pack()
 
-        # Build and place the buy/sell buttons frame
+        # entry field for amount of stocks to buy or sell
+        self.inputAmount = Entry(self, bg="white", fg="black", width=58, font="Arial 15")
+        self.inputAmount.pack()
+        self.inputAmount.insert(0, "Amount")
+        self.inputAmount.bind("<Button-1>", command(self.getInput))
+
+        # buy/sell buttons
         btn_frm = Frame(self)
-        btn_frm.pack()
+        btn_frm.pack(side=BOTTOM)
 
         b1 = Button(master=btn_frm, text="Buy", padx=40, pady=10, fg="white", bg="#2e8bc0", font="Arial 14 bold",
                     command=command(self.player.buy, self.getInput, no_funds))
@@ -201,7 +174,7 @@ class Game(Frame):
                     command=command(self.player.sell, self.getInput, no_funds))
         b2.pack(side=RIGHT, padx=50, pady=10)
 
-        # build and place the total score frame
+        # total score
         score_frm = Frame(self)
         Label(score_frm, text="SCORE: 0", fg="black", anchor="w", pady=10, font="Arial 14 bold").pack(side=LEFT)
         score_frm.pack()
