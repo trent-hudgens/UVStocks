@@ -36,7 +36,7 @@ def main():
 
     root.protocol("WM_DELETE_WINDOW", quit_me)
     root.title("UVStocks")
-    root.geometry("700x750")
+    root.geometry("770x750")
 
     #root.state("zoomed")#currently zoomed in to full screen because i dont have it working with a scalable window yet
 
@@ -48,9 +48,7 @@ def main():
 
     #stacking page frames on top of each other
     for frame in (title_frame, stock_frame, highscores_frame):
-        frame.place(x=0, y=0, width=700, height=750)
-
-    show_frame(title_frame)
+        frame.place(x=0, y=0, width=770, height=750)
 
     #begin title page
     title_logo_frm = Frame(title_frame)
@@ -75,7 +73,7 @@ def main():
 
 
     #begin name prompt page
-    name_prompt_frame.place(x=150, y=420, width=400, height=100)
+    name_prompt_frame.place(x=185, y=420, width=400, height=100)
     np_label_frame = Frame(name_prompt_frame)
     np_label = Label(np_label_frame, text="input name", fg="black", font="Arial 15")
     np_label.pack()
@@ -196,8 +194,8 @@ def main():
     Label(score_frm, text="SCORE: 0", fg="black", anchor="w", pady=10, font="Arial 14 bold").pack(side=LEFT)
     score_frm.pack()
 
-    #title_frame.place(x=0, y=0, width=stock_frame.winfo_width(), height=stock_frame.winfo_height())
-    #highscores_frame.place(x=0, y=0, width=stock_frame.winfo_width(), height=stock_frame.winfo_height())
+    show_frame(title_frame)
+
 
     root.mainloop()
 
