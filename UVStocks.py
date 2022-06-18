@@ -11,6 +11,14 @@ def command(f, *args, **kwargs):
     """allows passing of arguments when binding functions to tkinter buttons"""
     return lambda: f(*args, **kwargs)
 
+def show_frame(frame):
+    """raises the inputted frame to the top so it's visible"""
+    frame.tkraise()
+
+def submit_name(player, entry, stock_frame):
+    player.name = entry.get()
+    stock_frame.tkraise()
+
 
 def main():
     """main execution"""
@@ -28,10 +36,61 @@ def main():
 
     root.protocol("WM_DELETE_WINDOW", quit_me)
     root.title("UVStocks")
-    # root.configure(bg="green",)
+    root.geometry("770x750")
 
+    #root.state("zoomed")#currently zoomed in to full screen because i dont have it working with a scalable window yet
+
+    #page frames 
+    title_frame = Frame(root)
+    stock_frame = Frame(root)
+    highscores_frame = Frame(root)
+    name_prompt_frame = Frame(root)
+
+    #stacking page frames on top of each other
+    for frame in (title_frame, stock_frame, highscores_frame):
+        frame.place(x=0, y=0, width=770, height=750)
+
+    #begin title page
+    title_logo_frm = Frame(title_frame)
+    title_logo_frm.pack()
+
+    title_logo_img = Image.open("images/uvstocksSplashLogo.png")
+    title_logo_img = title_logo_img.resize((600, 675))  # Resize image
+    title_UVlogo = ImageTk.PhotoImage(title_logo_img)
+    Label(title_logo_frm, image=title_UVlogo).pack()
+
+
+    #buttons to go to the game or the leaderboard
+    btn_title_frame = Frame(title_frame)
+
+    titleB1 = Button(master=btn_title_frame, text="play", padx=50, pady=20, command=command(show_frame, name_prompt_frame))
+    titleB1.pack(side=LEFT, padx=50)
+
+    titleB2 = Button(master=btn_title_frame, text="leaderboard", padx=25, pady=20, command=command(show_frame, highscores_frame))
+    titleB2.pack(side=RIGHT, padx=50)
+
+    btn_title_frame.pack()
+
+
+    #begin name prompt page
+    name_prompt_frame.place(x=185, y=420, width=400, height=100)
+    np_label_frame = Frame(name_prompt_frame)
+    np_label = Label(np_label_frame, text="input name", fg="black", font="Arial 15")
+    np_label.pack()
+    np_label_frame.pack()
+    np_entry_frame = Frame(name_prompt_frame)
+    np_entry = Entry(np_entry_frame, bg="white", fg="black", width=25, font="Arial 15")
+    np_entry.pack(side=LEFT)
+    np_entry_frame.pack()
+    np_button_frame = Frame(name_prompt_frame)
+    np_button = Button(np_button_frame, text="submit", fg="black", font="Arial 15", command=command(submit_name, player, np_entry, stock_frame))
+    np_button.pack()
+    np_button_frame.pack()
+
+
+    #begin stock page
     # Build and place the logo frame
-    logo_frm = Frame(root)
+    logo_frm = Frame(stock_frame)
     logo_frm.pack()
 
     img = Image.open("images/UVStocks-logo.png")
@@ -40,7 +99,7 @@ def main():
     Label(logo_frm, image=UVlogo).pack()
 
     # build and place the labels for cash, shares held, and current stock price
-    cash_shares_frm = Frame(root)
+    cash_shares_frm = Frame(stock_frame)
     currentStockLabel = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
     currentStockLabel.pack(side=LEFT, padx=50, ipady=10)
     totalCash = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
@@ -60,7 +119,7 @@ def main():
         totalCash.config(text=f"Total Cash: {round(float(curr_cash_amount), 2)}")
 
     # Build and place the stock graph frame
-    graph_frm = Frame(root)
+    graph_frm = Frame(stock_frame)
     graph_frm.pack()
 
     fig = Figure(figsize=(5, 5), dpi=100)
@@ -70,7 +129,7 @@ def main():
 
     fig, ax = plt.subplots()
 
-    canvas = FigureCanvasTkAgg(fig, master=root)
+    canvas = FigureCanvasTkAgg(fig, master=stock_frame)
     canvas.get_tk_widget().pack()
 
     numStocksLabelUpdater(str(player.stocks_held))
@@ -97,7 +156,7 @@ def main():
     Label(text="", fg="black").pack()
 
     # entry field for amount of stocks to buy or sell
-    input_amount_frm = Frame(root)
+    input_amount_frm = Frame(stock_frame)
     input_amount_frm.pack()
 
     inputAmount = Entry(input_amount_frm, bg="white", fg="black", width=58, font="Arial 15")
@@ -119,7 +178,7 @@ def main():
     no_funds.pack()
 
     # Build and place the buy/sell buttons frame
-    btn_frm = Frame(root)
+    btn_frm = Frame(stock_frame)
     btn_frm.pack()
 
     b1 = Button(master=btn_frm, text="Buy", padx=40, pady=10, fg="white", bg="#2e8bc0", font="Arial 14 bold",
@@ -131,9 +190,12 @@ def main():
     b2.pack(side=RIGHT, padx=50, pady=10)
 
     # build and place the total score frame
-    score_frm = Frame(root)
+    score_frm = Frame(stock_frame)
     Label(score_frm, text="SCORE: 0", fg="black", anchor="w", pady=10, font="Arial 14 bold").pack(side=LEFT)
     score_frm.pack()
+
+    show_frame(title_frame)
+
 
     root.mainloop()
 

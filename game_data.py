@@ -56,3 +56,5 @@ class Player:
     def check_funds(self, desired_stocks):
         stock_price = self.stock.get_price()
         return (desired_stocks * stock_price) < self.wallet
+
+
