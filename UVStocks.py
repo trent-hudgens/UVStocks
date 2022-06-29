@@ -199,7 +199,7 @@ class Game(Frame):
         self.totalCash.config(text=f"Total Cash: {round(float(curr_cash_amount), 2)}")
 
     def scoreLabelUpdater(self, score):
-        score = self.player.calc_score()
+        score = self.player.update_score(self.player, self.stock_data.stock_price)
         self.scoreLabel.config(text=f"Net worth: {round(float(score))}") # TODO figure out naming. Net worth makes the most sense to me
 
     def getInput(self):
