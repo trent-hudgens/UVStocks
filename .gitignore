@@ -6,3 +6,4 @@ __pycache__/**/*
 *.suo
 *.pyc
 *.iml
+Records/*

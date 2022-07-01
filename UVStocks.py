@@ -1,11 +1,13 @@
 from tkinter import *
 from PIL import ImageTk, Image
+import csv
+
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from game_data import Player, StockData
 
+from game_data import Player, StockData
 
 
 # TODO DIAGNOSE
@@ -44,6 +46,8 @@ class GUI(Tk):
             self._frame.destroy()
         self._frame = new_frame
         self._frame.pack()
+
+        return self._frame
 
 
 class SplashScreen(Frame):
@@ -99,8 +103,19 @@ class NamePromptWindow(Toplevel):
         self.grab_set() # focuses onto this window, prevents interaction with the SplashScreen
 
     def submit(self, master):
-        self.entry_text = self.np_entry.get() # don't know if this is the best solution
-        GUI.switch_frame(master, Game) # idk why but I have to use the GUI method explicitly instead of just doing master.switch_frame
+
+        player_name = self.np_entry.get() # collect the user's name
+
+        # create csv file
+        headers = ['Action', 'Score', 'Wallet', 'Current Stock Price', 'Stocks bought']
+        with open(f'Records/records_of_{player_name}.csv', 'w', newline='')as file:
+            write_in_file = csv.writer(file)
+            write_in_file.writerow(headers)
+
+        # switch frame to the Game and set the Game's Player name
+        _frame = GUI.switch_frame(master, Game)
+        _frame.player.name = player_name
+
         self.destroy()
 
 
@@ -112,7 +127,7 @@ class Game(Frame):
         # initialize the game's stock data and player data. the way this works
         # is subject to change, not sure if this is the best thing
         self.stock_data = StockData()
-        self.player = Player(stock=self.stock_data) # TODO PASS IN PLAYER NAME FROM NAMEPROMPTWINDOW
+        self.player = Player(stock=self.stock_data)
 
         # build and place the logo
         img = Image.open("images/UVStocks-logo.png")
@@ -129,11 +144,11 @@ class Game(Frame):
         self.currentStockLabel = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
         self.currentStockLabel.pack(side=LEFT, padx=50) #, ipady=10)
 
-        self.totalCash = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
-        self.totalCash.pack(side=LEFT, padx=50)
+        self.totalCashLabel = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
+        self.totalCashLabel.pack(side=LEFT, padx=50)
 
-        self.totalStocks = Label(cash_shares_frm, text="", fg="black", anchor="e", font="Arial 10 bold")
-        self.totalStocks.pack(side=RIGHT, padx=50)
+        self.totalStocksLabel = Label(cash_shares_frm, text="", fg="black", anchor="e", font="Arial 10 bold")
+        self.totalStocksLabel.pack(side=RIGHT, padx=50)
 
         # build and place the stock graph
         x_axis = []  # x axis data, should be dates/times eventually. left empty for now.
@@ -155,10 +170,7 @@ class Game(Frame):
             # ax.set_ylim(700,1300) # configuration of the graph goes here
             axis.plot(y_axis)
 
-            self.stockLabelUpdater(self.stock_data.stock_price)
-            self.numStocksLabelUpdater(str(self.player.stocks_held))
-            self.totalCashLabelUpdater(str(self.player.wallet))
-            self.scoreLabelUpdater(self.player.score)
+            self.update_all_labels()
 
         self.ani = FuncAnimation(fig, animate, fargs=(x_axis, y_axis, ax), interval=500)  # change to 1000
 
@@ -188,19 +200,12 @@ class Game(Frame):
         self.scoreLabel = Label(self, text="SCORE: ", fg="black", anchor="w", pady=10, font="Arial 14 bold")
         self.scoreLabel.pack()
 
-    # TODO seems like there is a better solution to having four separate updaters...
-    def stockLabelUpdater(self, stock_price):
-        self.currentStockLabel.config(text=f"Current Stock Price: {round(stock_price, 2)}")
 
-    def numStocksLabelUpdater(self, stocks):
-        self.totalStocks.config(text=f"Number of Stocks Held: {round(int(stocks), 2)}")
-
-    def totalCashLabelUpdater(self, curr_cash_amount):
-        self.totalCash.config(text=f"Total Cash: {round(float(curr_cash_amount), 2)}")
-
-    def scoreLabelUpdater(self, score):
-        score = self.player.calc_score()
-        self.scoreLabel.config(text=f"Net worth: {round(float(score))}") # TODO figure out naming. Net worth makes the most sense to me
+    def update_all_labels(self):
+        self.currentStockLabel.config(text=f"Current Stock Price: {round(self.stock_data.stock_price, 2)}")
+        self.totalStocksLabel.config(text=f"Number of Stocks Held: {round(int(self.player.stocks_held), 2)}")
+        self.totalCashLabel.config(text=f"Total Cash: {round(float(self.player.wallet), 2)}")
+        self.scoreLabel.config(text=f"Net worth: {self.player.calc_score()}")
 
     def getInput(self):
         # function to grab number of stocks to buy/sell from user
