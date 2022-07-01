@@ -1,8 +1,8 @@
 """the game data including the stock data and others :)"""
 from stock_generator import stock_history
 import copy
-import csv
 from os.path import exists
+import csv
 
 
 class StockData:
@@ -18,7 +18,7 @@ class StockData:
 
 
 class Player:
-    def __init__(self, stock, name="Default", wallet=5000, stocks_held=0, score=None):
+    def __init__(self, stock, name=None, wallet=5000, stocks_held=0, score=None):
 
         # maybe not have Player have a stock.... don't know what to do here
         self.stock = stock
@@ -26,11 +26,6 @@ class Player:
         self.name = name
         self.stocks_held = stocks_held
         self.score = copy.copy(wallet)  # this is sus
-        print(name)
-        self.records = self.check_records(name)
-
-    def setName(self, player_name):
-        self.name = player_name
 
     def buy(self, get_input, no_funds):
         desired_stocks = get_input()
@@ -38,7 +33,8 @@ class Player:
             self.wallet -= (desired_stocks * self.stock.stock_price)
             self.stocks_held += desired_stocks
             no_funds.config(text="")  # TODO MAYBE DO ALL THE NO_FUNDS STUFF WITHIN check_funds?
-            self.update_score_record(self.name, desired_stocks, self.stock.stock_price, 'Buy')
+    
+            self.record_action("Buy", desired_stocks)
 
         else:
             print("You can't afford to buy that many stocks.")
@@ -52,7 +48,8 @@ class Player:
             self.wallet += (desired_stocks * self.stock.stock_price)
             self.stocks_held -= desired_stocks
             no_funds.config(text="")
-            self.update_score_record(self.name, desired_stocks, self.stock.stock_price, 'Sell')
+
+            self.record_action("Sell", desired_stocks)
 
         else:
             print("You are trying to sell too many stocks.")
@@ -64,71 +61,20 @@ class Player:
         stock_price = self.stock.get_price()
         return (desired_stocks * stock_price) < self.wallet
 
-    # def calc_score(self):
-    #     # maybe do this within the updater in UVStocks.py..... TODO Decide what to do
-    #     self.score = self.wallet + (self.stock.get_price() * self.stocks_held)
-    #     return self.score
-
-    def update_score_record(self, player, desire_stocks, stock_price, action):
-        """This method append (in his/her records) the transaction made"""
-        price = stock_price
-        stocks_buyed = desire_stocks
-        wallet = self.get_wallet()
-        score = self.get_score()
-        if wallet > score:
-            score = wallet
-        information = [score, price, stocks_buyed, wallet, action]
-        with open(f'Records/records_of_{player}.csv', 'a', newline='') as file:
-        # append to CSV file
-            writer_obj = csv.writer(file)
-            writer_obj.writerow(information)
-
-    def update_score(self, player, current_price):
-        with open(f'Records/records_of_{player.name}.csv', 'r')as file:
-            lines = file.readlines()
-            wallet = lines[-1].split(',')[-2]
-            acumulative = 0
-            if player.stocks_held > 0:
-                index = 0
-                for i in (range(player.stocks_held, 0, -1)) :
-                    price = lines[-player.stocks_held + index].strip().split(',')[1]
-                    amount_of_stocks = lines[-player.stocks_held + index].strip().split(',')[2]
-                    acumulative += float(price) * float(amount_of_stocks)
-                    index += 1
-                market_price = player.stocks_held * current_price + player.wallet
-                current_power = (float(wallet) + acumulative)
-                
-                if market_price > current_power:
-                    adjustmet = market_price - current_power
-                    player.score = current_power - adjustmet 
-                else:
-                    adjustmet = market_price - current_power
-                    player.score = current_power + adjustmet
-            else: 
-                return player.wallet 
-            return player.get_score()
-
-    def created_records(self, player):
-        """
-        This method created the header of a csv file, the name of the file contain the name of the player.
-        """
-        header = ['Score' , 'Price', 'Stocks buyed', 'Wallet', 'Action']
-        with open(f'Records/records_of_{player}.csv', 'w', newline='')as file:
-            # created a CSV file
-            write_in_file = csv.writer(file)
-            # write the header
-            write_in_file.writerow(header)
-
-    def get_score(self):
-        return self.score
+    def calc_score(self):
+        # maybe do this within the updater in UVStocks.py..... TODO Decide what to do
+        self.score = self.wallet + (self.stock.get_price() * self.stocks_held)
+        return round(self.score) # SCORE IS ALWAYS A WHOLE NUMBER?????? ASK CUSTOMER ABOUT THIS
     
-    def get_wallet(self):
-        return self.wallet
-
-    def check_records(self, name):
-        file_exists = exists(f"/Records/records_of_{name}.csv")
-        if file_exists is False:
-            self.records = self.created_records(name)
-            
-
-
+    def record_action(self, action, desired_stocks):
+        '''updates the user record csv file with their latest validated buy/sell action.'''
+        # headers: ['Action', 'Score', 'Wallet', 'Current Stock Price', 'Stocks bought']
+        score = self.calc_score()
+        wallet = round(self.wallet, 2)
+        price = round(self.stock.get_price(), 2)
+        headers = [action, score, wallet, price, desired_stocks]
+        
+        # append new action to 
+        with open(f'Records/records_of_{self.name}.csv', 'a', newline='')as file: # MAYBE 'w'
+            write_in_file = csv.writer(file)
+            write_in_file.writerow(headers)
