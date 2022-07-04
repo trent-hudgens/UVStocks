@@ -1,13 +1,15 @@
 from tkinter import *
 from PIL import ImageTk, Image
 import csv
+import os
 
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
+# from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.animation import FuncAnimation
 
-from game_data import Player, StockData
+from stockdata import StockData
+from player import Player
 
 
 # TODO DIAGNOSE
@@ -20,7 +22,8 @@ from game_data import Player, StockData
 
 def command(f, *args, **kwargs):
     """allows passing of arguments when binding functions to tkinter buttons"""
-    return lambda: f(*args, **kwargs)
+    return lambda:f(*args, **kwargs)
+
 
 class GUI(Tk):
     '''wrapper for the entire Tkinter game'''
@@ -56,7 +59,7 @@ class SplashScreen(Frame):
         Frame.__init__(self, master)
 
         # logo
-        path = "images/uvstocksSplashLogo.png"
+        path = "images/uvstocks-splash-logo.png"
         pil_img = Image.open(path).resize((600, 675))
         tk_img = ImageTk.PhotoImage(pil_img)
         self.logo_label = Label(self, image=tk_img)
@@ -108,6 +111,10 @@ class NamePromptWindow(Toplevel):
 
         # create csv file
         headers = ['Action', 'Score', 'Wallet', 'Current Stock Price', 'Stocks bought']
+
+        if not os.path.exists('Records'):
+            os.mkdir('Records')
+
         with open(f'Records/records_of_{player_name}.csv', 'w', newline='')as file:
             write_in_file = csv.writer(file)
             write_in_file.writerow(headers)
@@ -130,7 +137,7 @@ class Game(Frame):
         self.player = Player(stock=self.stock_data)
 
         # build and place the logo
-        img = Image.open("images/UVStocks-logo.png")
+        img = Image.open("images/uvstocks-logo.png")
         img = img.resize((200, 50))  # Resize image
         UVlogo = ImageTk.PhotoImage(img)
         logo_label = Label(self, image=UVlogo)
