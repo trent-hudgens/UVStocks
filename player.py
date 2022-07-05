@@ -1,5 +1,7 @@
 import copy
 import csv
+
+
 # from os.path import exists
 
 
@@ -19,7 +21,7 @@ class Player:
             self.wallet -= (desired_stocks * self.stock.stock_price)
             self.stocks_held += desired_stocks
             no_funds.config(text="")  # TODO MAYBE DO ALL THE NO_FUNDS STUFF WITHIN check_funds?
-    
+
             self.record_action("Buy", desired_stocks)
 
         else:
@@ -32,16 +34,14 @@ class Player:
         desired_stocks = get_input()
         if desired_stocks <= self.stocks_held:
             self.wallet += (desired_stocks * self.stock.stock_price)
-            self.stocks_held -= desired_stocks
             no_funds.config(text="")
-
-            self.record_action("Sell", desired_stocks)
+            self.stocks_held -= desired_stocks
 
         else:
             print("You are trying to sell too many stocks.")
             no_funds.config(text="Insufficent Stock Amount")
             # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
-            return int(1)
+        self.updateLeaderboards()
 
     def check_funds(self, desired_stocks):
         stock_price = self.stock.get_price()
@@ -50,17 +50,34 @@ class Player:
     def calc_score(self):
         # maybe do this within the updater in UVStocks.py..... TODO Decide what to do
         self.score = self.wallet + (self.stock.get_price() * self.stocks_held)
-        return round(self.score) # SCORE IS ALWAYS A WHOLE NUMBER?????? ASK CUSTOMER ABOUT THIS
-    
+        return round(self.score)  # SCORE IS ALWAYS A WHOLE NUMBER?????? ASK CUSTOMER ABOUT THIS
+
     def record_action(self, action, desired_stocks):
-        '''updates the user record csv file with their latest validated buy/sell action.'''
+        """updates the user record csv file with their latest validated buy/sell action."""
         # headers: ['Action', 'Score', 'Wallet', 'Current Stock Price', 'Stocks bought']
         score = self.calc_score()
         wallet = round(self.wallet, 2)
         price = round(self.stock.get_price(), 2)
         headers = [action, score, wallet, price, desired_stocks]
-        
+
         # append new action to 
-        with open(f'Records/records_of_{self.name}.csv', 'a', newline='')as file: # MAYBE 'w'
+        with open(f'Records/records_of_{self.name}.csv', 'a', newline='')as file:  # MAYBE 'w'
             write_in_file = csv.writer(file)
             write_in_file.writerow(headers)
+
+    def updateLeaderboards(self):
+        header = ['Name', 'Score']
+        with open("leaderboards.csv", 'r') as readerObj:
+            next(readerObj)
+            csv_reader = csv.reader(readerObj)
+            tuplesList = list(map(tuple, csv_reader))
+            tuplesList.append((str(self.name), str(round(self.score, 2))))
+            tuplesList.sort(key=lambda x: x[1])
+            sortedTuples = tuplesList
+            readerObj.close()
+        with open("leaderboards.csv", 'w', newline="") as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(header)
+            for i in range(0, len(sortedTuples)):
+                csvwriter.writerow(sortedTuples[i])
+
