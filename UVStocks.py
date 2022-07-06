@@ -96,6 +96,10 @@ class NamePromptWindow(Toplevel):
         self.grab_set()  # focuses onto this window, prevents interaction with the SplashScreen
 
     def submit(self, master):
+        """
+        creates a csv file with the player's name and switches to the game when the 
+        'submit' button is pressed
+        """
         player_name = self.np_entry.get()  # collect the user's name
 
         # create csv file
