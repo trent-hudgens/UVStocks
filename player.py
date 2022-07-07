@@ -37,6 +37,8 @@ class Player:
             no_funds.config(text="")
             self.stocks_held -= desired_stocks
 
+            self.record_action("Sell", desired_stocks)
+
         else:
             print("You are trying to sell too many stocks.")
             no_funds.config(text="Insufficent Stock Amount")
