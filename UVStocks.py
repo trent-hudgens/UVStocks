@@ -23,13 +23,14 @@ class GUI(Tk):
 
     def __init__(self):
         Tk.__init__(self)  # the main GUI window is a Tk object
+
         self.protocol("WM_DELETE_WINDOW", self.quit_me)
         self.title("UVStocks")
         self.geometry("770x750")
 
         # game switches to it's first frame, splashscreen
         self._frame = None
-        self.switch_frame = self.switch_frame(SplashScreen)
+        self.switch_frame(SplashScreen)
 
     def quit_me(self):  # define quit behavior
         self.quit()
@@ -121,7 +122,6 @@ class NamePromptWindow(Toplevel):
 
 class Game(Frame):
     def __init__(self, master):
-
         Frame.__init__(self, master)
 
         # initialize the game's stock data and player data. the way this works
@@ -220,72 +220,32 @@ class Game(Frame):
             amountStr = 0
         return int(amountStr)
 
-    header = ['Name', 'Score']
-    if os.path.exists('leaderboards.csv'):
-        print("The file exists")
-    else:
-        with open('leaderboards.csv', 'w+', newline="") as csvfile:
-            csvwriter = csv.writer(csvfile)
-            csvwriter.writerow(header)
-            for i in reversed(range(0, 10)):
-                csvwriter.writerow(("BLANK", int(0)))
-
 
 class Leaderboard(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
+
         header = ['Name', 'Score']
-        # TODO TODO TODO COMPLETE LEADERBOARD
-        # currently is just a label with some placeholder text
         Frame.configure(self, bg='black')
         Label(self, text="Leaderboard", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=3, padx=3)
-        if os.path.exists('leaderboards.csv'):
-            style = ttk.Style()
-            style.configure("mystyle.Treeview.Heading", font=('Arial', 13, 'bold'), rowheight=40)
-            style.configure("")
-            TableMargin = Frame(self, width=600)
-            TableMargin.pack(pady=3)
-            tree = ttk.Treeview(TableMargin, columns=("Name", "Score"), height=10, style="mystyle.Treeview")
-            tree.heading('Name', text="Name", anchor=CENTER)
-            tree.heading('Score', text="Score", anchor=CENTER)
-            tree.column('#0', stretch=NO, minwidth=0, width=0, anchor=CENTER)
-            tree.column('#1', stretch=NO, minwidth=0, width=300, anchor=CENTER)
-            tree.column('#2', stretch=NO, minwidth=0, width=300, anchor=CENTER)
-            tree.pack(expand=True, fill='y')
-            with open('leaderboards.csv', mode='r', newline='') as f:
-                reader = csv.DictReader(f, delimiter=',')
-                for row in reader:
-                    name = row['Name']
-                    score = row['Score']
-                    tree.insert("", 0, values=(name, score))
-                f.close()
 
-        else:
-            with open('leaderboards.csv', 'w', newline="") as csvfile:
-                csvwriter = csv.writer(csvfile)
-                csvwriter.writerow(header)
-                for i in reversed(range(0, 10)):
-                    csvwriter.writerow(("BLANK", int(0)))
-            csvfile.close()
-            style = ttk.Style()
-            style.configure("mystyle.Treeview.Heading", font=('Arial', 13, 'bold'), rowheight=40)
-            style.configure("")
-            TableMargin = Frame(self, width=600)
-            TableMargin.pack(pady=3)
-            tree = ttk.Treeview(TableMargin, columns=("Name", "Score"), height=10, style="mystyle.Treeview")
-            tree.heading('Name', text="Name", anchor=CENTER)
-            tree.heading('Score', text="Score", anchor=CENTER)
-            tree.column('#0', stretch=NO, minwidth=0, width=0, anchor=CENTER)
-            tree.column('#1', stretch=NO, minwidth=0, width=300, anchor=CENTER)
-            tree.column('#2', stretch=NO, minwidth=0, width=300, anchor=CENTER)
-            tree.pack(expand=True, fill='y')
-            with open('leaderboards.csv', mode='r', newline='') as f:
-                reader = csv.DictReader(f, delimiter=',')
-                for row in reader:
-                    name = row['Name']
-                    score = row['Score']
-                    tree.insert("", 0, values=(name, score))
-                f.close()
+        style = ttk.Style()
+        style.configure("mystyle.Treeview.Heading", font=('Arial', 13, 'bold'), rowheight=40)
+        TableMargin = Frame(self, width=600)
+        TableMargin.pack(pady=3)
+        tree = ttk.Treeview(TableMargin, columns=("Name", "Score"), height=10, style="mystyle.Treeview")
+        tree.heading('Name', text="Name", anchor=CENTER)
+        tree.heading('Score', text="Score", anchor=CENTER)
+        tree.column('#0', stretch=NO, minwidth=0, width=0, anchor=CENTER)
+        tree.column('#1', stretch=NO, minwidth=0, width=300, anchor=CENTER)
+        tree.column('#2', stretch=NO, minwidth=0, width=300, anchor=CENTER)
+        tree.pack(expand=True, fill='y')
+        with open('leaderboards.csv', mode='r', newline='') as f:
+            reader = csv.DictReader(f, delimiter=',')
+            for row in reader:
+                name = row['Name']
+                score = row['Score']
+                tree.insert("", 0, values=(name, score))
 
 
 def main():

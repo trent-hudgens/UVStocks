@@ -1,8 +1,6 @@
 import copy
 import csv
-
-
-# from os.path import exists
+import os
 
 
 class Player:
@@ -23,6 +21,7 @@ class Player:
             no_funds.config(text="")  # TODO MAYBE DO ALL THE NO_FUNDS STUFF WITHIN check_funds?
 
             self.record_action("Buy", desired_stocks)
+            self.update_leaderboards()
 
         else:
             print("You can't afford to buy that many stocks.")
@@ -38,12 +37,12 @@ class Player:
             self.stocks_held -= desired_stocks
 
             self.record_action("Sell", desired_stocks)
+            self.update_leaderboards()
 
         else:
             print("You are trying to sell too many stocks.")
             no_funds.config(text="Insufficent Stock Amount")
             # TODO MORE ERROR CHECKING (NEGATIVE NUMBERS ETC)
-        self.updateLeaderboards()
 
     def check_funds(self, desired_stocks):
         stock_price = self.stock.get_price()
@@ -67,16 +66,32 @@ class Player:
             write_in_file = csv.writer(file)
             write_in_file.writerow(headers)
 
-    def updateLeaderboards(self):
+    def update_leaderboards(self):
+        """updates the leaderboards with the user's last score."""
+
+        # create leaderboard csv if it doesn't already exist
         header = ['Name', 'Score']
+        if not os.path.exists('leaderboards.csv'):
+            with open('leaderboards.csv', 'w', newline="") as csvfile:
+                csvwriter = csv.writer(csvfile)
+                csvwriter.writerow(header)
+                for i in reversed(range(0, 10)):
+                    csvwriter.writerow(("BLANK", int(0)))
+
+        # create list of tuples that represent leaderboard
         with open("leaderboards.csv", 'r') as readerObj:
             next(readerObj)
             csv_reader = csv.reader(readerObj)
             tuplesList = list(map(tuple, csv_reader))
-            tuplesList.append((str(self.name), str(round(self.score, 2))))
-            tuplesList.sort(key=lambda x: x[1])
-            sortedTuples = tuplesList
+
+            user_leaderboard_entry = (str(self.name), str(round(self.score, 2)))
+            [tuplesList.pop(tuplesList.index(entry)) for entry in tuplesList if entry[0] == user_leaderboard_entry[0]]
+            tuplesList.append(user_leaderboard_entry)
+
+            sortedTuples = sorted(tuplesList, key=lambda x: x[1], reverse=True)
             readerObj.close()
+
+        # write new leaderboard
         with open("leaderboards.csv", 'w', newline="") as csvfile:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(header)
