@@ -26,7 +26,7 @@ class GUI(Tk):
 
         self.protocol("WM_DELETE_WINDOW", self.quit_me)
         self.title("UVStocks")
-        self.geometry("770x750")
+        self.geometry("800x750")
 
         # game switches to it's first frame, splashscreen
         self._frame = None
@@ -77,22 +77,26 @@ class SplashScreen(Frame):
 class NamePromptWindow(Toplevel):
     def __init__(self, master):
         Toplevel.__init__(self, master)
+        # Place the popup window based on the width and height of the splash screen
+        self.geometry(f'+{self.winfo_width()+ 399}+{self.winfo_height() + 374}') # TODO FINISH POPUP Window Calculations
 
-        # TODO MAKE THE WINDOW SPAWN NEAR THE SPLASH SCREEN WHEN IT'S CREATED
+        # Call function when we click on entry box
+        def click(*args):
+            self.np_entry.delete(0, 'end')
 
         # main name prompt frame, acts as master for this separate window
         self.name_prompt_frame = Frame(self)
-        self.name_prompt_frame.pack()
+        self.name_prompt_frame.pack(pady=3, padx=10)
 
-        self.np_label = Label(self.name_prompt_frame, text="input name", fg="black", font="Arial 15")
-        self.np_label.pack()
-
-        self.np_entry = Entry(self.name_prompt_frame, bg="white", fg="black", width=25, font="Arial 15")
-        self.np_entry.pack()
+        self.np_entry = Entry(self.name_prompt_frame, bg="white", fg="black", width=25, font="Arial 15",
+                              justify='center')
+        self.np_entry.pack(pady=6)
+        self.np_entry.insert(0, "Input Name")
+        self.np_entry.bind("<Button-1>", click)
 
         self.np_button = Button(self.name_prompt_frame, text="submit", fg="black", font="Arial 15",
-                                command=command(self.submit, master))  # TODO ????? switch isnteaD?
-        self.np_button.pack()
+                                command=command(self.submit, master))  # TODO ????? switch instead?
+        self.np_button.pack(pady=7)
 
         self.grab_set()  # focuses onto this window, prevents interaction with the SplashScreen
 
@@ -211,23 +215,24 @@ class Game(Frame):
         self.scoreLabel.config(text=f"Net worth: {self.player.calc_score()}")
 
     def getInput(self):
-        # function to grab number of stocks to buy/sell from user
-        # TODO this should be generic, and should just return the text inside the box when called,
-        # not just for the num stocks sell/buy feature.
-        amountStr = str(self.inputAmount.get())
-        if amountStr == "Amount":
-            self.inputAmount.delete(0, 'end')
-            amountStr = 0
-        return int(amountStr)
+        amountVal = self.inputAmount.get()
+        return amountVal
 
 
 class Leaderboard(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
-
-        header = ['Name', 'Score']
         Frame.configure(self, bg='black')
         Label(self, text="Leaderboard", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=3, padx=3)
+
+        # Create a leaderboards file if player decides to check leaderboards before starting game
+        header = ['Name', 'Score']
+        if not os.path.exists('leaderboards.csv'):
+            with open('leaderboards.csv', 'w', newline="") as csv_file:
+                csv_writer = csv.writer(csv_file)
+                csv_writer.writerow(header)
+                for i in reversed(range(0, 10)):
+                    csv_writer.writerow(("BLANK", int(0)))
 
         style = ttk.Style()
         style.configure("mystyle.Treeview.Heading", font=('Arial', 13, 'bold'), rowheight=40)
