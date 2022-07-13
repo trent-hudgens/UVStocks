@@ -32,6 +32,11 @@ class GUI(Tk):
 
         self.create_leaderboard()
 
+        # initialize stock data and player for the session
+        # i don;t know if this is the best way
+        self.stock_data = StockData()
+        self.player = Player(stock=self.stock_data)
+
         # game switches to it's first frame, splashscreen
         self._frame = None
         self.switch_frame(SplashScreen)
@@ -140,10 +145,11 @@ class Game(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
 
-        # initialize the game's stock data and player data. the way this works
-        # is subject to change, not sure if this is the best thing
-        self.stock_data = StockData()
-        self.player = Player(stock=self.stock_data)
+        # initialize the game's stock data and player data
+        # GUI houses both of these
+        # TODO discuss and decide the best way to do this
+        self.stock_data = master.stock_data
+        self.player = master.player
 
         # back button
         self.np_button = Button(self, text="Leaderboard", font="Arial 14", command=command(master.switch_frame, Leaderboard))
@@ -186,7 +192,7 @@ class Game(Frame):
         def animate(i, x_axis, y_axis, axis):  # i don't know why 'i' has to be supplied. ???
             """animate function to be called repeatedly to update the graph"""
             self.stock_data.update_price()
-            # print(self.stock_data.stock_price)  # DEBUG. prints stock price every time it updates
+            print(self.stock_data.stock_price)  ### DEBUG. prints stock price every time it updates
             y_axis.append(self.stock_data.stock_price)
 
             axis.clear()
@@ -249,10 +255,10 @@ class Leaderboard(Frame):
         # TODO rigorous testing of this bit of logic. 
         if True in [fnmatch.fnmatch(child, '!game*') for child in master.__dict__['children']]:
             cmd = command(master.switch_frame, Game)
-            print("WENT BACK TO GAME") ### DEBUG
+            # print("WENT BACK TO GAME") ### DEBUG
         else:
             cmd = command(master.switch_frame, SplashScreen)
-            print("WENT BACK TO SPLASHCREEN") ### DEBUG
+            # print("WENT BACK TO SPLASHCREEN") ### DEBUG
 
         # back button
         self.np_button = Button(self, text="Back", font="Arial 14", command=cmd)
