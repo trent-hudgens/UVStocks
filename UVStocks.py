@@ -266,15 +266,6 @@ class Leaderboard(Frame):
         Frame.configure(self) #, bg='black')
         Label(self, text="Leaderboard", font="Helvetica 20 bold").pack(side="top", fill="x", pady=3, padx=3)
 
-        # Create a leaderboards file if player decides to check leaderboards before starting game
-        header = ['Name', 'Score']
-        if not os.path.exists('leaderboards.csv'):
-            with open('leaderboards.csv', 'w', newline="") as csv_file:
-                csv_writer = csv.writer(csv_file)
-                csv_writer.writerow(header)
-                for i in reversed(range(0, 10)):
-                    csv_writer.writerow(("BLANK", int(0)))
-
         style = ttk.Style()
         style.configure("mystyle.Treeview.Heading", font="Arial 15 bold", rowheight=40)
         # TableMargin = Frame(self, width=1000)
@@ -286,9 +277,7 @@ class Leaderboard(Frame):
         # tree.column('#1', stretch=NO, minwidth=0, width=300, anchor=CENTER)
         # tree.column('#2', stretch=NO, minwidth=0, width=300, anchor=CENTER)
         tree.pack(side="bottom", expand=True, fill='y')
-        
-        # TODO This bit of code needs to be ran every time you switch to the frame.
-        # it might already be running this every time since the switch_frame() destroys the old one...... ??? 
+
         with open('leaderboards.csv', mode='r', newline='') as f:
             reader = csv.DictReader(f, delimiter=',')
 

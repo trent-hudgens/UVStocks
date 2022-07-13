@@ -89,7 +89,7 @@ class Player:
             [tuplesList.pop(tuplesList.index(entry)) for entry in tuplesList if entry[0] == user_leaderboard_entry[0]]
             tuplesList.append(user_leaderboard_entry)
 
-            sortedTuples = sorted(tuplesList, key=lambda x: x[1])
+            sortedTuples = sorted(tuplesList, key=lambda x: x[1], reverse=True)
             readerObj.close()
 
         # write new leaderboard
