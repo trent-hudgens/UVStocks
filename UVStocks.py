@@ -28,7 +28,21 @@ class GUI(Tk):
         self.protocol("WM_DELETE_WINDOW", self.quit_me)
         self.title("UVStocks")
         # self.configure(bg="#282828") # ugly but it saves the eyes and also helps you see what your frames are
-        self.geometry("800x800")
+
+        # Set window width and height
+        width_of_win = 800
+        height_of_win = 800
+
+        # Get screen width and height
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
+        # Calculate where to place the window on the user's computer screen
+        x_coord = (screen_width / 2) - (width_of_win / 2)
+        y_coord = (screen_height / 2) - (height_of_win / 2)
+
+        # Place window
+        self.geometry("%dx%d+%d+%d" % (width_of_win, height_of_win, x_coord, y_coord))
 
         self.create_leaderboard()
 
@@ -53,7 +67,7 @@ class GUI(Tk):
         self._frame.pack()
 
         return self._frame
-    
+
     def create_leaderboard(self):
         """create leaderboard csv if it doesn't already exist"""
         header = ['Name', 'Score']
@@ -81,14 +95,13 @@ class SplashScreen(Frame):
         self.btn_title_frame = Frame(self)
         self.btn_title_frame.pack()
 
-        self.titleB1 = Button(master=self.btn_title_frame, text="Play", font="Arial 14", padx=50, pady=20, 
+        self.titleB1 = Button(master=self.btn_title_frame, text="Play", font="Arial 14", padx=50, pady=20,
                               command=self.open_name_prompt)
         self.titleB1.pack(side=LEFT, padx=50)
 
         self.titleB2 = Button(master=self.btn_title_frame, text="Leaderboard", font="Arial 14", padx=25, pady=20,
                               command=command(master.switch_frame, Leaderboard))
         self.titleB2.pack(side=RIGHT, padx=50)
-
 
     def open_name_prompt(self):
         # NamePromptWindow is an attribute of SplashScreen for now ???
@@ -98,8 +111,21 @@ class SplashScreen(Frame):
 class NamePromptWindow(Toplevel):
     def __init__(self, master):
         Toplevel.__init__(self, master)
-        # Place the popup window based on the width and height of the splash screen
-        self.geometry(f'+{self.winfo_width()+ 399}+{self.winfo_height() + 374}') # TODO FINISH POPUP Window Calculations
+
+        # Set window width and height
+        width_of_win = 300
+        height_of_win = 105
+
+        # Get screen width and height
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
+        # Calculate where to place the window on the user's computer screen
+        x_coord = (screen_width / 2) - (width_of_win / 2)
+        y_coord = (screen_height / 2) - (height_of_win / 2)
+
+        # Place window
+        self.geometry("%dx%d+%d+%d" % (width_of_win, height_of_win, x_coord, y_coord))
 
         # Call function when we click on entry box
         def click(*args):
@@ -156,7 +182,8 @@ class Game(Frame):
         self.player = master.player
 
         # back button
-        self.np_button = Button(self, text="Leaderboard", font="Arial 14", command=command(master.switch_frame, Leaderboard))
+        self.np_button = Button(self, text="Leaderboard", font="Arial 14",
+                                command=command(master.switch_frame, Leaderboard))
         self.np_button.pack(side="top", padx=50, pady=20)
 
         # build and place the logo
@@ -196,7 +223,7 @@ class Game(Frame):
         def animate(i, x_axis, y_axis, axis):  # i don't know why 'i' has to be supplied. ???
             """animate function to be called repeatedly to update the graph"""
             self.stock_data.update_price()
-            print(self.stock_data.stock_price)  ### DEBUG. prints stock price every time it updates
+            print(self.stock_data.stock_price)  # DEBUG. prints stock price every time it updates
             y_axis.append(self.stock_data.stock_price)
 
             axis.clear()
@@ -263,7 +290,7 @@ class Leaderboard(Frame):
         self.np_button.pack(side="top", padx=50, pady=20)
 
         header = ['Name', 'Score']
-        Frame.configure(self) #, bg='black')
+        Frame.configure(self)  # , bg='black')
         Label(self, text="Leaderboard", font="Helvetica 20 bold").pack(side="top", fill="x", pady=3, padx=3)
 
         style = ttk.Style()
@@ -274,19 +301,19 @@ class Leaderboard(Frame):
         tree.heading('Name', text="Name", anchor=CENTER)
         tree.heading('Score', text="Score", anchor=CENTER)
         tree.column('#0', stretch=NO, minwidth=0, width=0, anchor=CENTER)
-        # tree.column('#1', stretch=NO, minwidth=0, width=300, anchor=CENTER)
-        # tree.column('#2', stretch=NO, minwidth=0, width=300, anchor=CENTER)
+        tree.column('#1', stretch=NO, minwidth=0, width=300, anchor=CENTER)
+        tree.column('#2', stretch=NO, minwidth=0, width=300, anchor=CENTER)
         tree.pack(side="bottom", expand=True, fill='y')
 
         with open('leaderboards.csv', mode='r', newline='') as f:
             reader = csv.DictReader(f, delimiter=',')
 
-            i=0
+            i = 0
             for row in reader:
                 name = row['Name']
                 score = row['Score']
                 tree.insert("", index=i, values=(name, score))
-                i+=1
+                i += 1
 
 
 def main():
