@@ -3,6 +3,7 @@ from PIL import ImageTk, Image
 import csv
 import os
 import tkinter.ttk as ttk
+import fnmatch
 
 import matplotlib.pyplot as plt
 # from matplotlib.figure import Figure
@@ -26,13 +27,21 @@ class GUI(Tk):
 
         self.protocol("WM_DELETE_WINDOW", self.quit_me)
         self.title("UVStocks")
-        self.geometry("800x750")
+        # self.configure(bg="#282828") # ugly but it saves the eyes and also helps you see what your frames are
+        self.geometry("800x800")
+
+        self.create_leaderboard()
+
+        # initialize stock data and player for the session
+        # i don;t know if this is the best way
+        self.stock_data = StockData()
+        self.player = Player(stock=self.stock_data)
 
         # game switches to it's first frame, splashscreen
         self._frame = None
         self.switch_frame(SplashScreen)
 
-    def quit_me(self):  # define quit behavior
+    def quit_me(self):
         self.quit()
         self.destroy()
 
@@ -44,6 +53,16 @@ class GUI(Tk):
         self._frame.pack()
 
         return self._frame
+    
+    def create_leaderboard(self):
+        """create leaderboard csv if it doesn't already exist"""
+        header = ['Name', 'Score']
+        if not os.path.exists('leaderboards.csv'):
+            with open('leaderboards.csv', 'w', newline="") as csvfile:
+                csvwriter = csv.writer(csvfile)
+                csvwriter.writerow(header)
+                for i in reversed(range(0, 10)):
+                    csvwriter.writerow(("BLANK", int(0)))
 
 
 class SplashScreen(Frame):
@@ -62,12 +81,14 @@ class SplashScreen(Frame):
         self.btn_title_frame = Frame(self)
         self.btn_title_frame.pack()
 
-        self.titleB1 = Button(master=self.btn_title_frame, text="Play", padx=50, pady=20, command=self.open_name_prompt)
+        self.titleB1 = Button(master=self.btn_title_frame, text="Play", font="Arial 14", padx=50, pady=20, 
+                              command=self.open_name_prompt)
         self.titleB1.pack(side=LEFT, padx=50)
 
-        self.titleB2 = Button(master=self.btn_title_frame, text="Leaderboard", padx=25, pady=20,
+        self.titleB2 = Button(master=self.btn_title_frame, text="Leaderboard", font="Arial 14", padx=25, pady=20,
                               command=command(master.switch_frame, Leaderboard))
         self.titleB2.pack(side=RIGHT, padx=50)
+
 
     def open_name_prompt(self):
         # NamePromptWindow is an attribute of SplashScreen for now ???
@@ -128,10 +149,15 @@ class Game(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
 
-        # initialize the game's stock data and player data. the way this works
-        # is subject to change, not sure if this is the best thing
-        self.stock_data = StockData()
-        self.player = Player(stock=self.stock_data)
+        # initialize the game's stock data and player data
+        # GUI houses both of these
+        # TODO discuss and decide the best way to do this
+        self.stock_data = master.stock_data
+        self.player = master.player
+
+        # back button
+        self.np_button = Button(self, text="Leaderboard", font="Arial 14", command=command(master.switch_frame, Leaderboard))
+        self.np_button.pack(side="top", padx=50, pady=20)
 
         # build and place the logo
         img = Image.open("images/uvstocks-logo.png")
@@ -170,7 +196,7 @@ class Game(Frame):
         def animate(i, x_axis, y_axis, axis):  # i don't know why 'i' has to be supplied. ???
             """animate function to be called repeatedly to update the graph"""
             self.stock_data.update_price()
-            # print(self.stock_data.stock_price)  # DEBUG. prints stock price every time it updates
+            print(self.stock_data.stock_price)  ### DEBUG. prints stock price every time it updates
             y_axis.append(self.stock_data.stock_price)
 
             axis.clear()
@@ -222,35 +248,45 @@ class Game(Frame):
 class Leaderboard(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
-        Frame.configure(self, bg='black')
-        Label(self, text="Leaderboard", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=3, padx=3)
 
-        # Create a leaderboards file if player decides to check leaderboards before starting game
+        # logic that changes the command whether or not the game has been loaded yet
+        # TODO rigorous testing of this bit of logic. 
+        if True in [fnmatch.fnmatch(child, '!game*') for child in master.__dict__['children']]:
+            cmd = command(master.switch_frame, Game)
+            # print("WENT BACK TO GAME") ### DEBUG
+        else:
+            cmd = command(master.switch_frame, SplashScreen)
+            # print("WENT BACK TO SPLASHCREEN") ### DEBUG
+
+        # back button
+        self.np_button = Button(self, text="Back", font="Arial 14", command=cmd)
+        self.np_button.pack(side="top", padx=50, pady=20)
+
         header = ['Name', 'Score']
-        if not os.path.exists('leaderboards.csv'):
-            with open('leaderboards.csv', 'w', newline="") as csv_file:
-                csv_writer = csv.writer(csv_file)
-                csv_writer.writerow(header)
-                for i in reversed(range(0, 10)):
-                    csv_writer.writerow(("BLANK", int(0)))
+        Frame.configure(self) #, bg='black')
+        Label(self, text="Leaderboard", font="Helvetica 20 bold").pack(side="top", fill="x", pady=3, padx=3)
 
         style = ttk.Style()
-        style.configure("mystyle.Treeview.Heading", font=('Arial', 13, 'bold'), rowheight=40)
-        TableMargin = Frame(self, width=600)
-        TableMargin.pack(pady=3)
-        tree = ttk.Treeview(TableMargin, columns=("Name", "Score"), height=10, style="mystyle.Treeview")
+        style.configure("mystyle.Treeview.Heading", font="Arial 15 bold", rowheight=40)
+        # TableMargin = Frame(self, width=1000)
+        # TableMargin.pack(pady=3)
+        tree = ttk.Treeview(self, columns=("Name", "Score"), height=15, style="mystyle.Treeview")
         tree.heading('Name', text="Name", anchor=CENTER)
         tree.heading('Score', text="Score", anchor=CENTER)
         tree.column('#0', stretch=NO, minwidth=0, width=0, anchor=CENTER)
-        tree.column('#1', stretch=NO, minwidth=0, width=300, anchor=CENTER)
-        tree.column('#2', stretch=NO, minwidth=0, width=300, anchor=CENTER)
-        tree.pack(expand=True, fill='y')
+        # tree.column('#1', stretch=NO, minwidth=0, width=300, anchor=CENTER)
+        # tree.column('#2', stretch=NO, minwidth=0, width=300, anchor=CENTER)
+        tree.pack(side="bottom", expand=True, fill='y')
+
         with open('leaderboards.csv', mode='r', newline='') as f:
             reader = csv.DictReader(f, delimiter=',')
+
+            i=0
             for row in reader:
                 name = row['Name']
                 score = row['Score']
-                tree.insert("", 0, values=(name, score))
+                tree.insert("", index=i, values=(name, score))
+                i+=1
 
 
 def main():

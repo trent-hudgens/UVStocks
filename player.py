@@ -78,31 +78,24 @@ class Player:
     def update_leaderboards(self):
         """updates the leaderboards with the user's last score."""
 
-        # create leaderboard csv if it doesn't already exist
-        header = ['Name', 'Score']
-        if not os.path.exists('leaderboards.csv'):
-            with open('leaderboards.csv', 'w', newline="") as csv_file:
-                csv_writer = csv.writer(csv_file)
-                csv_writer.writerow(header)
-                for i in reversed(range(0, 10)):
-                    csv_writer.writerow(("BLANK", int(0)))
-
         # create list of tuples that represent leaderboard
+        # add the current user's latest score to the list
         with open("leaderboards.csv", 'r') as readerObj:
             next(readerObj)
             csv_reader = csv.reader(readerObj)
             tuplesList = list(map(tuple, csv_reader))
 
-            user_leaderboard_entry = (str(self.name), str(round(self.score, 2)))
+            user_leaderboard_entry = (str(self.name), str(round(self.score)))
             [tuplesList.pop(tuplesList.index(entry)) for entry in tuplesList if entry[0] == user_leaderboard_entry[0]]
             tuplesList.append(user_leaderboard_entry)
 
-            sortedTuples = sorted(tuplesList, key=lambda x: x[1])
+            sortedTuples = sorted(tuplesList, key=lambda x: x[1], reverse=True)
             readerObj.close()
 
         # write new leaderboard
-        with open("leaderboards.csv", 'w', newline="") as csv_file:
-            writer = csv.writer(csv_file)
-            writer.writerow(header)
+        header = ['Name', 'Score']
+        with open("leaderboards.csv", 'w', newline="") as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(header)
             for i in range(0, len(sortedTuples)):
-                writer.writerow(sortedTuples[i])
+                csvwriter.writerow(sortedTuples[i])
