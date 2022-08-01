@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.animation import FuncAnimation
 
-from stockdata import StockData
+from stock_tracker import StockTracker
 from player import Player
 
 
@@ -128,10 +128,11 @@ class Game(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
 
-        # initialize the game's stock data and player data. the way this works
-        # is subject to change, not sure if this is the best thing
-        self.stock_data = StockData()
-        self.player = Player(stock=self.stock_data)
+        # self.stock_data = StockData()
+        self.stock_data = StockTracker()
+        # make AI - give them stocktracker
+        # initialize generator for managing AI TODO KYLER
+        self.player = Player(stock=self.stock_data) # other keywords can be given to customize player
 
         # build and place the logo
         img = Image.open("images/uvstocks-logo.png")
@@ -168,10 +169,10 @@ class Game(Frame):
             self.inputAmount.delete(0, 'end')
 
         def animate(i, x_axis, y_axis, axis):  # i don't know why 'i' has to be supplied. ???
-            """animate function to be called repeatedly to update the graph"""
-            self.stock_data.update_price()
-            # print(self.stock_data.stock_price)  # DEBUG. prints stock price every time it updates
-            y_axis.append(self.stock_data.stock_price)
+            """animate function to be called repeaiitedly to update the graph"""
+            # don't worry about this call right now
+            # print(self.stock_data.price)  # DEBUG. prints stock price every time it updates
+            y_axis.append(self.stock_data.price)
 
             axis.clear()
             y_axis = y_axis[-25:]  # only show the last 25 values
@@ -209,7 +210,7 @@ class Game(Frame):
         self.scoreLabel.pack()
 
     def update_all_labels(self):
-        self.currentStockLabel.config(text=f"Current Stock Price: {round(self.stock_data.stock_price, 2)}")
+        self.currentStockLabel.config(text=f"Current Stock Price: {round(self.stock_data.price, 2)}")
         self.totalStocksLabel.config(text=f"Number of Stocks Held: {round(int(self.player.stocks_held), 2)}")
         self.totalCashLabel.config(text=f"Total Cash: {round(float(self.player.wallet), 2)}")
         self.scoreLabel.config(text=f"Net worth: {self.player.calc_score()}")

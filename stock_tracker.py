@@ -31,6 +31,7 @@ class StockTracker:
         if there aren't that many stocks available
             - it returns the number of stocks bought
         """
+        # TODO CHECK THAT STOCKS ARE AVALIABLE
         self._buy_count += count
         return count
 
