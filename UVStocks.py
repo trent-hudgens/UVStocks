@@ -62,7 +62,8 @@ class SplashScreen(Frame):
         self.btn_title_frame = Frame(self)
         self.btn_title_frame.pack()
 
-        self.titleB1 = Button(master=self.btn_title_frame, text="Play", padx=50, pady=20, command=self.open_name_prompt)
+        self.titleB1 = Button(master=self.btn_title_frame, text="Play",
+                              padx=50, pady=20, command=self.open_name_prompt)
         self.titleB1.pack(side=LEFT, padx=50)
 
         self.titleB2 = Button(master=self.btn_title_frame, text="Leaderboard", padx=25, pady=20,
@@ -78,7 +79,9 @@ class NamePromptWindow(Toplevel):
     def __init__(self, master):
         Toplevel.__init__(self, master)
         # Place the popup window based on the width and height of the splash screen
-        self.geometry(f'+{self.winfo_width()+ 399}+{self.winfo_height() + 374}') # TODO FINISH POPUP Window Calculations
+        # TODO FINISH POPUP Window Calculations
+        self.geometry(
+            f'+{self.winfo_width()+ 399}+{self.winfo_height() + 374}')
 
         # Call function when we click on entry box
         def click(*args):
@@ -108,7 +111,8 @@ class NamePromptWindow(Toplevel):
         player_name = self.np_entry.get()  # collect the user's name
 
         # create csv file
-        headers = ['Action', 'Score', 'Wallet', 'Current Stock Price', 'Stocks bought']
+        headers = ['Action', 'Score', 'Wallet',
+                   'Current Stock Price', 'Stocks bought']
 
         if not os.path.exists('Records'):
             os.mkdir('Records')
@@ -132,7 +136,8 @@ class Game(Frame):
         self.stock_data = StockTracker()
         # make AI - give them stocktracker
         # initialize generator for managing AI TODO KYLER
-        self.player = Player(stock=self.stock_data) # other keywords can be given to customize player
+        # other keywords can be given to customize player
+        self.player = Player(stock=self.stock_data)
 
         # build and place the logo
         img = Image.open("images/uvstocks-logo.png")
@@ -146,17 +151,21 @@ class Game(Frame):
         cash_shares_frm = Frame(self)
         cash_shares_frm.pack()
 
-        self.currentStockLabel = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
+        self.currentStockLabel = Label(
+            cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
         self.currentStockLabel.pack(side=LEFT, padx=50)  # , ipady=10)
 
-        self.totalCashLabel = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
+        self.totalCashLabel = Label(
+            cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
         self.totalCashLabel.pack(side=LEFT, padx=50)
 
-        self.totalStocksLabel = Label(cash_shares_frm, text="", fg="black", anchor="e", font="Arial 10 bold")
+        self.totalStocksLabel = Label(
+            cash_shares_frm, text="", fg="black", anchor="e", font="Arial 10 bold")
         self.totalStocksLabel.pack(side=RIGHT, padx=50)
 
         # build and place the stock graph
-        x_axis = []  # x axis data, should be dates/times eventually. left empty for now.
+        # x axis data, should be dates/times eventually. left empty for now.
+        x_axis = []
         y_axis = []  # y axis data - will contain stock price values
 
         fig, ax = plt.subplots()
@@ -170,8 +179,9 @@ class Game(Frame):
 
         def animate(i, x_axis, y_axis, axis):  # i don't know why 'i' has to be supplied. ???
             """animate function to be called repeaiitedly to update the graph"""
-            # don't worry about this call right now
-            # print(self.stock_data.price)  # DEBUG. prints stock price every time it updates
+            self.stock_data.update_stock()
+            # DEBUG. prints stock price every time it updates
+            print(self.stock_data.price)
             y_axis.append(self.stock_data.price)
 
             axis.clear()
@@ -181,14 +191,16 @@ class Game(Frame):
 
             self.update_all_labels()
 
-        self.ani = FuncAnimation(fig, animate, fargs=(x_axis, y_axis, ax), interval=500)  # change to 1000
+        self.ani = FuncAnimation(fig, animate, fargs=(
+            x_axis, y_axis, ax), interval=500)  # change to 1000
 
         # build and place the no funds label when the user doesn't have enough money to buy a stock
         no_funds = Label(self, text="", fg="black")
         no_funds.pack()
 
         # build and place the entry field for amount of stocks to buy or sell
-        self.inputAmount = Entry(self, bg="white", fg="black", width=58, font="Arial 15")
+        self.inputAmount = Entry(
+            self, bg="white", fg="black", width=58, font="Arial 15")
         self.inputAmount.pack()
         self.inputAmount.insert(0, "Amount")
         self.inputAmount.bind("<Button-1>", click)
@@ -206,13 +218,17 @@ class Game(Frame):
         b2.pack(side=RIGHT, padx=50, pady=10)
 
         # total score
-        self.scoreLabel = Label(self, text="SCORE: ", fg="black", anchor="w", pady=10, font="Arial 14 bold")
+        self.scoreLabel = Label(
+            self, text="SCORE: ", fg="black", anchor="w", pady=10, font="Arial 14 bold")
         self.scoreLabel.pack()
 
     def update_all_labels(self):
-        self.currentStockLabel.config(text=f"Current Stock Price: {round(self.stock_data.price, 2)}")
-        self.totalStocksLabel.config(text=f"Number of Stocks Held: {round(int(self.player.stocks_held), 2)}")
-        self.totalCashLabel.config(text=f"Total Cash: {round(float(self.player.wallet), 2)}")
+        self.currentStockLabel.config(
+            text=f"Current Stock Price: {round(self.stock_data.price, 2)}")
+        self.totalStocksLabel.config(
+            text=f"Number of Stocks Held: {round(int(self.player.stocks_held), 2)}")
+        self.totalCashLabel.config(
+            text=f"Total Cash: {round(float(self.player.wallet), 2)}")
         self.scoreLabel.config(text=f"Net worth: {self.player.calc_score()}")
 
     def getInput(self):
@@ -224,7 +240,8 @@ class Leaderboard(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
         Frame.configure(self, bg='black')
-        Label(self, text="Leaderboard", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=3, padx=3)
+        Label(self, text="Leaderboard", font=('Helvetica', 18, "bold")).pack(
+            side="top", fill="x", pady=3, padx=3)
 
         # Create a leaderboards file if player decides to check leaderboards before starting game
         header = ['Name', 'Score']
@@ -236,10 +253,12 @@ class Leaderboard(Frame):
                     csv_writer.writerow(("BLANK", int(0)))
 
         style = ttk.Style()
-        style.configure("mystyle.Treeview.Heading", font=('Arial', 13, 'bold'), rowheight=40)
+        style.configure("mystyle.Treeview.Heading", font=(
+            'Arial', 13, 'bold'), rowheight=40)
         TableMargin = Frame(self, width=600)
         TableMargin.pack(pady=3)
-        tree = ttk.Treeview(TableMargin, columns=("Name", "Score"), height=10, style="mystyle.Treeview")
+        tree = ttk.Treeview(TableMargin, columns=(
+            "Name", "Score"), height=10, style="mystyle.Treeview")
         tree.heading('Name', text="Name", anchor=CENTER)
         tree.heading('Score', text="Score", anchor=CENTER)
         tree.column('#0', stretch=NO, minwidth=0, width=0, anchor=CENTER)
