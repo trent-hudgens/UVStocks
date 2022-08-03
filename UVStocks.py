@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.animation import FuncAnimation
 
-from stockdata import StockData
+from stock_tracker import StockTracker
 from player import Player
 
 
@@ -48,7 +48,7 @@ class GUI(Tk):
 
         # initialize stock data and player for the session
         # i don;t know if this is the best way
-        self.stock_data = StockData()
+        self.stock_data = StockTracker()
         self.player = Player(stock=self.stock_data)
 
         # game switches to it's first frame, splashscreen
@@ -155,7 +155,8 @@ class NamePromptWindow(Toplevel):
         player_name = self.np_entry.get()  # collect the user's name
 
         # create csv file
-        headers = ['Action', 'Score', 'Wallet', 'Current Stock Price', 'Stocks bought']
+        headers = ['Action', 'Score', 'Wallet',
+                   'Current Stock Price', 'Stocks bought']
 
         if not os.path.exists('Records'):
             os.mkdir('Records')
@@ -198,17 +199,21 @@ class Game(Frame):
         cash_shares_frm = Frame(self)
         cash_shares_frm.pack()
 
-        self.currentStockLabel = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
+        self.currentStockLabel = Label(
+            cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
         self.currentStockLabel.pack(side=LEFT, padx=50)  # , ipady=10)
 
-        self.totalCashLabel = Label(cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
+        self.totalCashLabel = Label(
+            cash_shares_frm, text="", fg="black", anchor="w", font="Arial 10 bold")
         self.totalCashLabel.pack(side=LEFT, padx=50)
 
-        self.totalStocksLabel = Label(cash_shares_frm, text="", fg="black", anchor="e", font="Arial 10 bold")
+        self.totalStocksLabel = Label(
+            cash_shares_frm, text="", fg="black", anchor="e", font="Arial 10 bold")
         self.totalStocksLabel.pack(side=RIGHT, padx=50)
 
         # build and place the stock graph
-        x_axis = []  # x axis data, should be dates/times eventually. left empty for now.
+        # x axis data, should be dates/times eventually. left empty for now.
+        x_axis = []
         y_axis = []  # y axis data - will contain stock price values
 
         fig, ax = plt.subplots()
@@ -221,10 +226,11 @@ class Game(Frame):
             self.inputAmount.delete(0, 'end')
 
         def animate(i, x_axis, y_axis, axis):  # i don't know why 'i' has to be supplied. ???
-            """animate function to be called repeatedly to update the graph"""
-            self.stock_data.update_price()
-            print(self.stock_data.stock_price)  # DEBUG. prints stock price every time it updates
-            y_axis.append(self.stock_data.stock_price)
+            """animate function to be called repeaiitedly to update the graph"""
+            self.stock_data.update_stock()
+            # DEBUG. prints stock price every time it updates
+            print(self.stock_data.price)
+            y_axis.append(self.stock_data.price)
 
             axis.clear()
             y_axis = y_axis[-25:]  # only show the last 25 values
@@ -233,14 +239,16 @@ class Game(Frame):
 
             self.update_all_labels()
 
-        self.ani = FuncAnimation(fig, animate, fargs=(x_axis, y_axis, ax), interval=500)  # change to 1000
+        self.ani = FuncAnimation(fig, animate, fargs=(
+            x_axis, y_axis, ax), interval=500)  # change to 1000
 
         # build and place the no funds label when the user doesn't have enough money to buy a stock
         no_funds = Label(self, text="", fg="black")
         no_funds.pack()
 
         # build and place the entry field for amount of stocks to buy or sell
-        self.inputAmount = Entry(self, bg="white", fg="black", width=58, font="Arial 15")
+        self.inputAmount = Entry(
+            self, bg="white", fg="black", width=58, font="Arial 15")
         self.inputAmount.pack()
         self.inputAmount.insert(0, "Amount")
         self.inputAmount.bind("<Button-1>", click)
@@ -258,13 +266,17 @@ class Game(Frame):
         b2.pack(side=RIGHT, padx=50, pady=10)
 
         # total score
-        self.scoreLabel = Label(self, text="SCORE: ", fg="black", anchor="w", pady=10, font="Arial 14 bold")
+        self.scoreLabel = Label(
+            self, text="SCORE: ", fg="black", anchor="w", pady=10, font="Arial 14 bold")
         self.scoreLabel.pack()
 
     def update_all_labels(self):
-        self.currentStockLabel.config(text=f"Current Stock Price: {round(self.stock_data.stock_price, 2)}")
-        self.totalStocksLabel.config(text=f"Number of Stocks Held: {round(int(self.player.stocks_held), 2)}")
-        self.totalCashLabel.config(text=f"Total Cash: {round(float(self.player.wallet), 2)}")
+        self.currentStockLabel.config(
+            text=f"Current Stock Price: {round(self.stock_data.price, 2)}")
+        self.totalStocksLabel.config(
+            text=f"Number of Stocks Held: {round(int(self.player.stocks_held), 2)}")
+        self.totalCashLabel.config(
+            text=f"Total Cash: {round(float(self.player.wallet), 2)}")
         self.scoreLabel.config(text=f"Net worth: {self.player.calc_score()}")
 
     def getInput(self):
