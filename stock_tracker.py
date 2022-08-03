@@ -13,11 +13,11 @@ class StockTracker:
     """iterator that changes the stock price base on its supply and demand"""
 
     def __init__(
-        self,
-        initial_value=INITIAL_VALUE,
-        total_stocks=TOTAL_STOCKS,
-        initial_sell_count=TOTAL_STOCKS,
-        base_change=BASE_CHANGE,
+            self,
+            initial_value=INITIAL_VALUE,
+            total_stocks=TOTAL_STOCKS,
+            initial_sell_count=TOTAL_STOCKS,
+            base_change=BASE_CHANGE,
     ):
         if total_stocks < initial_sell_count:
             raise NoStock

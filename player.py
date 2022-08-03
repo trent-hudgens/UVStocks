@@ -4,6 +4,7 @@ import os
 
 from stock_tracker import StockTracker
 
+
 class BasePlayer:
     def __init__(self, stock, wallet=5000, name=None, stocks_held=0):
         # maybe not have Player have a stock.... don't know what to do here
@@ -12,14 +13,17 @@ class BasePlayer:
         self.name = name
         self.stocks_held = stocks_held
         self.score = copy.copy(wallet)  # this is sus
-    
+
     def buy(self):
         pass
+
     def sell(self):
         pass
 
+
 class AI(BasePlayer):
-    '''stripped down version of Player - no need to validate input, add score to leaderboard, etc'''
+    """stripped down version of Player - no need to validate input, add score to leaderboard, etc"""
+
     def buy(self, desired_stocks):
         # buy the stock
         self.wallet -= (desired_stocks * self.stock.price)
@@ -30,6 +34,7 @@ class AI(BasePlayer):
         self.wallet += (desired_stocks * self.stock.price)
         self.stocks_held -= desired_stocks
         self.stock.sell_stock(desired_stocks)
+
 
 class Player(BasePlayer):
     def buy(self, get_input, no_funds):
@@ -42,7 +47,7 @@ class Player(BasePlayer):
             print("You can't afford to buy that many stocks.")
             no_funds.config(text="Insufficent Funds")
             return
-        elif desired_stocks > self.stock.sell_count: # TODO JARED 
+        elif desired_stocks > self.stock.sell_count:  # TODO JARED
             print("There aren't enough stocks for sale on the market right now.")
             no_funds.config(text="There aren't enough stocks for sale on the market right now.")
             return
@@ -87,7 +92,7 @@ class Player(BasePlayer):
 
         if desired_stocks < 0:
             no_funds.config(text="You can only use positive numbers")
-        
+
         return desired_stocks
 
     def check_funds(self, desired_stocks):

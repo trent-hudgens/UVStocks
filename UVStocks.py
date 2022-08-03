@@ -12,6 +12,16 @@ from matplotlib.animation import FuncAnimation
 
 from stock_tracker import StockTracker
 from player import Player
+from player import AI
+
+
+def aiGenerator():
+    ai_list = []
+    for i in range(100):
+        ai_list.append(AI(StockTracker()))
+
+    while True:
+        print("This is a placeholder")
 
 
 def command(f, *args, **kwargs):
@@ -50,6 +60,7 @@ class GUI(Tk):
         # i don;t know if this is the best way
         self.stock_data = StockTracker()
         self.player = Player(stock=self.stock_data)
+        aiGenerator()
 
         # game switches to it's first frame, splashscreen
         self._frame = None
@@ -95,13 +106,15 @@ class SplashScreen(Frame):
         self.btn_title_frame = Frame(self)
         self.btn_title_frame.pack()
 
-        self.titleB1 = Button(master=self.btn_title_frame, text="Play", font="Arial 14", padx=50, pady=20,
+        self.titleB1 = Button(master=self.btn_title_frame, text="Play", font="Arial 16 bold", fg="white", bg="#2e8bc0",
+                              padx=50, pady=20, borderwidth=4,
                               command=self.open_name_prompt)
-        self.titleB1.pack(side=LEFT, padx=50)
+        self.titleB1.pack(side=LEFT, padx=50, pady=12)
 
-        self.titleB2 = Button(master=self.btn_title_frame, text="Leaderboard", font="Arial 14", padx=25, pady=20,
+        self.titleB2 = Button(master=self.btn_title_frame, text="Leaderboard", font="Arial 16 bold", fg="white",
+                              bg="#2e8bc0", padx=25, pady=20, borderwidth=4,
                               command=command(master.switch_frame, Leaderboard))
-        self.titleB2.pack(side=RIGHT, padx=50)
+        self.titleB2.pack(side=RIGHT, padx=50, pady=12)
 
     def open_name_prompt(self):
         # NamePromptWindow is an attribute of SplashScreen for now ???
@@ -141,8 +154,8 @@ class NamePromptWindow(Toplevel):
         self.np_entry.insert(0, "Input Name")
         self.np_entry.bind("<Button-1>", click)
 
-        self.np_button = Button(self.name_prompt_frame, text="submit", fg="black", font="Arial 15",
-                                command=command(self.submit, master))  # TODO ????? switch instead?
+        self.np_button = Button(self.name_prompt_frame, text="submit", font="Arial 15", fg="white", bg="#2e8bc0",
+                                borderwidth=3, command=command(self.submit, master))  # TODO ????? switch instead?
         self.np_button.pack(pady=7)
 
         self.grab_set()  # focuses onto this window, prevents interaction with the SplashScreen
@@ -183,7 +196,7 @@ class Game(Frame):
         self.player = master.player
 
         # back button
-        self.np_button = Button(self, text="Leaderboard", font="Arial 14",
+        self.np_button = Button(self, text="Leaderboard", font="Arial 14", fg="white", bg="#2e8bc0", borderwidth=3,
                                 command=command(master.switch_frame, Leaderboard))
         self.np_button.pack(side="top", padx=50, pady=20)
 
@@ -243,7 +256,7 @@ class Game(Frame):
             x_axis, y_axis, ax), interval=500)  # change to 1000
 
         # build and place the no funds label when the user doesn't have enough money to buy a stock
-        no_funds = Label(self, text="", fg="black")
+        no_funds = Label(self, text="", fg="black", font="Arial 14 bold")
         no_funds.pack()
 
         # build and place the entry field for amount of stocks to buy or sell
@@ -258,11 +271,11 @@ class Game(Frame):
         btn_frm.pack(side=BOTTOM)
 
         b1 = Button(master=btn_frm, text="Buy", padx=40, pady=10, fg="white", bg="#2e8bc0", font="Arial 14 bold",
-                    command=command(self.player.buy, self.getInput, no_funds))
+                    borderwidth=3, command=command(self.player.buy, self.getInput, no_funds))
         b1.pack(side=LEFT, padx=50, pady=10)
 
         b2 = Button(master=btn_frm, text="Sell", padx=40, pady=10, fg="white", bg="#2e8bc0", font="Arial 14 bold",
-                    command=command(self.player.sell, self.getInput, no_funds))
+                    borderwidth=3, command=command(self.player.sell, self.getInput, no_funds))
         b2.pack(side=RIGHT, padx=50, pady=10)
 
         # total score
@@ -298,7 +311,8 @@ class Leaderboard(Frame):
             # print("WENT BACK TO SPLASHCREEN") ### DEBUG
 
         # back button
-        self.np_button = Button(self, text="Back", font="Arial 14", command=cmd)
+        self.np_button = Button(self, text="Back", font="Arial 14", command=cmd, fg="white", bg="#2e8bc0",
+                                borderwidth=2)
         self.np_button.pack(side="top", padx=50, pady=20)
 
         header = ['Name', 'Score']
