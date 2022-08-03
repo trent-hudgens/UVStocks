@@ -65,7 +65,7 @@ class StockTracker:
         # the ratio is between 0 and 1, so shift so half are below 0.5
         # when the ratio is low, it means the price goes down
         # when the ratio is high, it means the price goes up
-        self._price = (ratio - .5) * self._base_change
+        self._price += (ratio - .5) * self._base_change
         self._sell_count = self._future_sell_count + self._sell_count - self._buy_count
 
 
