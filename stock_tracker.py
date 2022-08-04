@@ -1,7 +1,7 @@
 # pylint: disable=too-many-instance-attributes
 """All the logic for Generating the stock and storing it's history"""
 INITIAL_VALUE = 1000
-TOTAL_STOCKS = 1000
+TOTAL_STOCKS = 500
 BASE_CHANGE = 100
 
 
@@ -61,7 +61,7 @@ class StockTracker:
 
     def update_stock(self):
         """updates the stock information for one tick"""
-        ratio = self._buy_count / self._sell_count
+        ratio = 0 if self._sell_count == 0 else self._buy_count / self._sell_count
         # the ratio is between 0 and 1, so shift so half are below 0.5
         # when the ratio is low, it means the price goes down
         # when the ratio is high, it means the price goes up

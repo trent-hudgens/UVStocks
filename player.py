@@ -29,12 +29,13 @@ class AI(BasePlayer):
         self.wallet -= (desired_stocks * self.stock.price)
         self.stocks_held += desired_stocks
         self.stock.buy_stock(desired_stocks)
+        print(StockTracker.buy_count)
 
     def sell(self, desired_stocks):
         self.wallet += (desired_stocks * self.stock.price)
         self.stocks_held -= desired_stocks
         self.stock.sell_stock(desired_stocks)
-
+        print("Stock sold")
 
 class Player(BasePlayer):
     def buy(self, get_input, no_funds):
@@ -59,6 +60,7 @@ class Player(BasePlayer):
         self.record_action("Buy", desired_stocks)
         self.update_leaderboards()
         self.stock.buy_stock(desired_stocks)
+        print(StockTracker().buy_count)
 
         no_funds.config(text="")  # TODO MAYBE DO ALL THE NO_FUNDS STUFF WITHIN check_funds?
 

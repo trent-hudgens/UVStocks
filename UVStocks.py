@@ -5,6 +5,7 @@ import os
 import tkinter.ttk as ttk
 import fnmatch
 
+
 import matplotlib.pyplot as plt
 # from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -12,16 +13,7 @@ from matplotlib.animation import FuncAnimation
 
 from stock_tracker import StockTracker
 from player import Player
-from player import AI
-
-
-def aiGenerator():
-    ai_list = []
-    for i in range(100):
-        ai_list.append(AI(StockTracker()))
-
-    while True:
-        print("This is a placeholder")
+from AIGenerator import ai_generator
 
 
 def command(f, *args, **kwargs):
@@ -60,7 +52,6 @@ class GUI(Tk):
         # i don;t know if this is the best way
         self.stock_data = StockTracker()
         self.player = Player(stock=self.stock_data)
-        aiGenerator()
 
         # game switches to it's first frame, splashscreen
         self._frame = None
@@ -233,6 +224,7 @@ class Game(Frame):
 
         canvas = FigureCanvasTkAgg(fig, master=self)
         canvas.get_tk_widget().pack()
+        ai_iter = ai_generator(self.stock_data)
 
         # Call function when we click on entry box
         def click(*args):
@@ -251,6 +243,8 @@ class Game(Frame):
             axis.plot(y_axis)
 
             self.update_all_labels()
+            next(ai_iter)
+
 
         self.ani = FuncAnimation(fig, animate, fargs=(
             x_axis, y_axis, ax), interval=500)  # change to 1000
@@ -282,6 +276,8 @@ class Game(Frame):
         self.scoreLabel = Label(
             self, text="SCORE: ", fg="black", anchor="w", pady=10, font="Arial 14 bold")
         self.scoreLabel.pack()
+
+
 
     def update_all_labels(self):
         self.currentStockLabel.config(
